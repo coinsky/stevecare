@@ -3,7 +3,7 @@ package tokens
 import (
 	"errors"
 
-	"github.com/steve-care-software/stevecare/vm/lexers/cardinality"
+	"github.com/steve-care-software/stevecare/vm/lexers/domain/cardinality"
 )
 
 type elementWithCardinalityBuilder struct {

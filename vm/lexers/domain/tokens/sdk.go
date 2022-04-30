@@ -1,6 +1,6 @@
 package tokens
 
-import "github.com/steve-care-software/stevecare/vm/lexers/cardinality"
+import "github.com/steve-care-software/stevecare/vm/lexers/domain/cardinality"
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {
@@ -30,12 +30,14 @@ func NewElementBuilder() ElementBuilder {
 // Builder represents the token builder
 type Builder interface {
 	Create() Builder
+	WithIndex(index uint) Builder
 	WithList(lines Lines) Builder
 	Now() (Token, error)
 }
 
 // Token represents a token
 type Token interface {
+	Index() uint
 	Lines() Lines
 }
 

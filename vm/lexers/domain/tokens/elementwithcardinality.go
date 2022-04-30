@@ -1,6 +1,6 @@
 package tokens
 
-import "github.com/steve-care-software/stevecare/vm/lexers/cardinality"
+import "github.com/steve-care-software/stevecare/vm/lexers/domain/cardinality"
 
 type elementWithCardinality struct {
 	element     Element
