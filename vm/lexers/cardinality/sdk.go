@@ -1,5 +1,15 @@
 package cardinality
 
+// NewBuilder creates a new builder instance
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewRangeBuilder creates a new range builder
+func NewRangeBuilder() RangeBuilder {
+	return createRangeBuilder()
+}
+
 // Builder represents the cardinality builder
 type Builder interface {
 	Create() Builder
@@ -13,7 +23,7 @@ type Cardinality interface {
 	IsRange() bool
 	Range() Range
 	IsSpecific() bool
-	Specific() uint
+	Specific() *uint
 }
 
 // RangeBuilder represents the range builder
