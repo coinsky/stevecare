@@ -2,10 +2,35 @@ package tokens
 
 import "github.com/steve-care-software/stevecare/vm/lexers/cardinality"
 
+// NewBuilder creates a new builder instance
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewLinesBuilder creates a new lines builder
+func NewLinesBuilder() LinesBuilder {
+	return createLinesBuilder()
+}
+
+// NewLineBuilder creates a new line builder
+func NewLineBuilder() LineBuilder {
+	return createLineBuilder()
+}
+
+// NewElementWithCardinalityBuilder creates a new element with cardinality builder
+func NewElementWithCardinalityBuilder() ElementWithCardinalityBuilder {
+	return createElementWithCardinalityBuilder()
+}
+
+// NewElementBuilder creates a new element builder
+func NewElementBuilder() ElementBuilder {
+	return createElementBuilder()
+}
+
 // Builder represents the token builder
 type Builder interface {
 	Create() Builder
-	WithLList(lines Lines) Builder
+	WithList(lines Lines) Builder
 	Now() (Token, error)
 }
 
