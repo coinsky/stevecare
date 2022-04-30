@@ -27,15 +27,15 @@ func (app *builder) WithIndex(index uint) Builder {
 	return app
 }
 
-// WithList adds a Lines to the builder
-func (app *builder) WithList(lines Lines) Builder {
+// WithLines adds a Lines to the builder
+func (app *builder) WithLines(lines Lines) Builder {
 	app.lines = lines
 	return app
 }
 
 // Now builds a new Token instance
 func (app *builder) Now() (Token, error) {
-	if app.pIndex != nil {
+	if app.pIndex == nil {
 		return nil, errors.New("the index is mandatory in order to build a Token instance")
 	}
 

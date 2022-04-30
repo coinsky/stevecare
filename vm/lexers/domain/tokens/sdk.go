@@ -31,7 +31,7 @@ func NewElementBuilder() ElementBuilder {
 type Builder interface {
 	Create() Builder
 	WithIndex(index uint) Builder
-	WithList(lines Lines) Builder
+	WithLines(lines Lines) Builder
 	Now() (Token, error)
 }
 
