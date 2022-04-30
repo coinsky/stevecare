@@ -1,50 +1,36 @@
 package results
 
 type result struct {
-	mistake Mistake
-	success Success
+	index     uint
+	path      []uint
+	isSuccess bool
 }
 
-func createResultWithMistake(
-	mistake Mistake,
-) Result {
-	return createResultInternally(mistake, nil)
-}
-
-func createResultWithSuccess(
-	success Success,
-) Result {
-	return createResultInternally(nil, success)
-}
-
-func createResultInternally(
-	mistake Mistake,
-	success Success,
+func createResult(
+	index uint,
+	path []uint,
+	isSuccess bool,
 ) Result {
 	out := result{
-		mistake: mistake,
-		success: success,
+		index:     index,
+		path:      path,
+		isSuccess: isSuccess,
 	}
 
 	return &out
 }
 
-// IsMistake returns true if there is a mistake, false otherwise
-func (obj *result) IsMistake() bool {
-	return obj.mistake != nil
+// Index returns the index
+func (obj *result) Index() uint {
+	return obj.index
 }
 
-// Mistake returns the mistake, if any
-func (obj *result) Mistake() Mistake {
-	return obj.mistake
+// Path returns the path
+func (obj *result) Path() []uint {
+	return obj.path
 }
 
-// IsSuccess returns true if there is a success, false otherwise
+// IsSuccess returns true if successful, falseotherwise
 func (obj *result) IsSuccess() bool {
-	return obj.success != nil
-}
-
-// Success returns the success, if any
-func (obj *result) Success() Success {
-	return obj.success
+	return obj.isSuccess
 }

@@ -86,13 +86,6 @@ func NewTokenWithSpecificCardinalityWithByteForTests(tokenIndex uint, specific u
 	return NewTokenWithSingleElementInSingleLineForTests(tokenIndex, element, cardinality)
 }
 
-// NewTokenWithSpecificCardinalityWithTokenForTests creates a new token with specific cardinality with token for tests
-func NewTokenWithSpecificCardinalityWithTokenForTests(tokenIndex uint, specific uint, token tokens.Token) tokens.Token {
-	cardinality := NewCardinalityWithSpecificForTests(specific)
-	element := NewElementWithTokenForTests(token)
-	return NewTokenWithSingleElementInSingleLineForTests(tokenIndex, element, cardinality)
-}
-
 // NewTokenWithSingleElementInSingleLineForTests creates a new token with single element in a singleline for tests
 func NewTokenWithSingleElementInSingleLineForTests(tokenIndex uint, element tokens.Element, cardinality cardinality.Cardinality) tokens.Token {
 	elementWithCardinality := NewElementWithCardinalityWithElementAndCardinalityForTests(element, cardinality)

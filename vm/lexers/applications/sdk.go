@@ -8,9 +8,7 @@ import (
 // NewApplication creates a new application
 func NewApplication() Application {
 	resultBuilder := results.NewBuilder()
-	successBuilder := results.NewSuccessBuilder()
-	mistakeBuilder := results.NewMistakeBuilder()
-	return createApplication(resultBuilder, successBuilder, mistakeBuilder)
+	return createApplication(resultBuilder)
 }
 
 // Application represents a lexer application

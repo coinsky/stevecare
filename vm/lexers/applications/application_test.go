@@ -7,7 +7,7 @@ import (
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 )
 
-func TestLexer_withReference_withSuccessIndex_Success(t *testing.T) {
+func TestLexer_withReference_withSuccessIndex_isSuccess(t *testing.T) {
 	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
 	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
 	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
@@ -38,25 +38,76 @@ func TestLexer_withReference_withSuccessIndex_Success(t *testing.T) {
 		return
 	}
 
+	index := result.Index()
+	if index != 7 {
+		t.Errorf("the index was expected to be %d, %d returned", 7, index)
+		return
+	}
+
 	if !result.IsSuccess() {
 		t.Errorf("the result was expected to be successful")
 		return
 	}
 
-	success := result.Success()
-	if !success.HasIndex() {
-		t.Errorf("the success was expected to contain an index")
-		return
-	}
-
-	pIndex := success.Index()
-	if *pIndex != 7 {
-		t.Errorf("the index was expected to be %d, %d returned", 7, *pIndex)
+	path := result.Path()
+	expectedPath := []uint{5, 0, 5, 0, 5, 2, 3, 2, 1, 1}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
 	}
 }
 
-func TestLexer_withReference_isInfiniteRecursive_Mistake(t *testing.T) {
+func TestLexer_withReference_withSuccessIndex_notEnoughData_isNotSuccess(t *testing.T) {
+	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
+	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
+	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
+	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
+
+	conditionFirstLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
+		openTokenElWithCard,
+		NewElementWithCardinalityWithReferenceAndCardinalityForTests(uint(4), uint(5), NewCardinalityWithSpecificForTests(1)),
+		closeTokenElWithCard,
+	})
+
+	conditionSecondLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
+		fiveTokenElWithCard,
+		smallerThanTokenElWithCard,
+		fiveTokenElWithCard,
+	})
+
+	rootToken := NewTokenWithLinesForTests(uint(5), []tokens.Line{
+		conditionFirstLine,
+		conditionSecondLine,
+	})
+
+	data := []byte("((5<5)")
+	application := NewApplication()
+	result, err := application.Execute(rootToken, data)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	index := result.Index()
+	if index != 0 {
+		t.Errorf("the index was expected to be %d, %d returned", 0, index)
+		return
+	}
+
+	if result.IsSuccess() {
+		t.Errorf("the result was expected to NOT be successful")
+		return
+	}
+
+	path := result.Path()
+	expectedPath := []uint{5}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
+		return
+	}
+}
+
+func TestLexer_withReference_isInfiniteRecursive_isNotSuccess(t *testing.T) {
 	conditionFirstLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
 		NewElementWithCardinalityWithReferenceAndCardinalityForTests(uint(4), uint(5), NewCardinalityWithSpecificForTests(1)),
 	})
@@ -73,13 +124,26 @@ func TestLexer_withReference_isInfiniteRecursive_Mistake(t *testing.T) {
 		return
 	}
 
-	if !result.IsMistake() {
-		t.Errorf("the result was expected to be successful")
+	index := result.Index()
+	if index != 0 {
+		t.Errorf("the index was expected to be %d, %d returned", 0, index)
+		return
+	}
+
+	if result.IsSuccess() {
+		t.Errorf("the result was expected to NOT be successful")
+		return
+	}
+
+	path := result.Path()
+	expectedPath := []uint{5}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
 	}
 }
 
-func TestLexer_withUndeclaredReference_Mistake(t *testing.T) {
+func TestLexer_withUndeclaredReference_isNotSuccess(t *testing.T) {
 	invalidReferenceIndex := uint(20)
 	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
 	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
@@ -111,13 +175,26 @@ func TestLexer_withUndeclaredReference_Mistake(t *testing.T) {
 		return
 	}
 
-	if !result.IsMistake() {
-		t.Errorf("the result was expected to be successful")
+	index := result.Index()
+	if index != 0 {
+		t.Errorf("the index was expected to be %d, %d returned", 0, index)
+		return
+	}
+
+	if result.IsSuccess() {
+		t.Errorf("the result was expected to NOT be successful")
+		return
+	}
+
+	path := result.Path()
+	expectedPath := []uint{5}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
 	}
 }
 
-func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_withSuccessIndex_Success(t *testing.T) {
+func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_withSuccessIndex_isSuccess(t *testing.T) {
 	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
 	hyphenTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte("-")[0]), NewCardinalityWithSpecificForTests(1))
 	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
@@ -139,26 +216,27 @@ func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_withSuccessInde
 		return
 	}
 
+	index := result.Index()
+	if index != 3 {
+		t.Errorf("the index was expected to be %d, %d returned", 3, index)
+		return
+	}
+
 	if !result.IsSuccess() {
 		t.Errorf("the result was expected to be successful")
 		return
 	}
 
-	success := result.Success()
-	if !success.HasIndex() {
-		t.Errorf("the success was expected to contain an index")
-		return
-	}
-
-	pIndex := success.Index()
-	if *pIndex != 3 {
-		t.Errorf("the index was expected to be %d, %d returned", 3, *pIndex)
+	path := result.Path()
+	expectedPath := []uint{3, 0, 1, 2}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
 	}
 
 }
 
-func TestLexer_withOneLine_withSpecificCardinality_withByte_withoutSuccessIndex_Success(t *testing.T) {
+func TestLexer_withOneLine_withSpecificCardinality_withByte_withoutSuccessIndex_isSuccess(t *testing.T) {
 	tokenIndex := uint(0)
 	specific := uint(1)
 	byteVal := []byte("(")
@@ -171,19 +249,26 @@ func TestLexer_withOneLine_withSpecificCardinality_withByte_withoutSuccessIndex_
 		return
 	}
 
+	index := result.Index()
+	if index != 1 {
+		t.Errorf("the index was expected to be %d, %d returned", 1, index)
+		return
+	}
+
 	if !result.IsSuccess() {
 		t.Errorf("the result was expected to be successful")
 		return
 	}
 
-	success := result.Success()
-	if success.HasIndex() {
-		t.Errorf("the success was expected to NOT contain an index")
+	path := result.Path()
+	expectedPath := []uint{0}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
 	}
 }
 
-func TestLexer_withOneLine_withMinimumCardinality_withByte_withExactlyMinOccurences_Success(t *testing.T) {
+func TestLexer_withOneLine_withMinimumCardinality_withByte_withExactlyMinOccurences_isSuccess(t *testing.T) {
 	tokenIndex := uint(0)
 	minimum := uint(2)
 	byteVal := []byte("(")
@@ -197,19 +282,26 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withExactlyMinOccuren
 		return
 	}
 
+	index := result.Index()
+	if index != 2 {
+		t.Errorf("the index was expected to be %d, %d returned", 2, index)
+		return
+	}
+
 	if !result.IsSuccess() {
 		t.Errorf("the result was expected to be successful")
 		return
 	}
 
-	success := result.Success()
-	if success.HasIndex() {
-		t.Errorf("the success was expected to NOT contain an index")
+	path := result.Path()
+	expectedPath := []uint{0}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
 	}
 }
 
-func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccurences_Success(t *testing.T) {
+func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccurences_isSuccess(t *testing.T) {
 	tokenIndex := uint(0)
 	minimum := uint(2)
 	byteVal := []byte("(")
@@ -223,19 +315,26 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccure
 		return
 	}
 
+	index := result.Index()
+	if index != 3 {
+		t.Errorf("the index was expected to be %d, %d returned", 3, index)
+		return
+	}
+
 	if !result.IsSuccess() {
 		t.Errorf("the result was expected to be successful")
 		return
 	}
 
-	success := result.Success()
-	if success.HasIndex() {
-		t.Errorf("the success was expected to NOT contain an index")
+	path := result.Path()
+	expectedPath := []uint{0}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
 	}
 }
 
-func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_Mistake(t *testing.T) {
+func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_isNotSuccess(t *testing.T) {
 	tokenIndex := uint(0)
 	minimum := uint(2)
 	byteVal := []byte("(")
@@ -249,35 +348,26 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_M
 		return
 	}
 
+	index := result.Index()
+	if index != 0 {
+		t.Errorf("the index was expected to be %d, %d returned", 0, index)
+		return
+	}
+
 	if result.IsSuccess() {
 		t.Errorf("the result was expected to NOT be successful")
 		return
 	}
 
-	mistake := result.Mistake()
-	if mistake.Index() != 0 {
-		t.Errorf("the mistake was expected to be at index %d, %d returned", 0, mistake.Index())
-		return
-	}
-
-	index := mistake.Index()
-	if index != 0 {
-		t.Errorf("the mistake index was expected to be %d, %d returned", 0, index)
-		return
-	}
-
-	expectedPath := []uint{
-		token.Index(),
-	}
-
-	retPath := mistake.Path()
-	if !reflect.DeepEqual(expectedPath, retPath) {
-		t.Errorf("the mistake path was expected to be %v, %v returned", expectedPath, retPath)
+	path := result.Path()
+	expectedPath := []uint{0}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
 	}
 }
 
-func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_Mistake(t *testing.T) {
+func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_isNotSuccess(t *testing.T) {
 	tokenIndex := uint(0)
 	minimum := uint(2)
 	maximum := uint(5)
@@ -292,35 +382,26 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_Mi
 		return
 	}
 
-	if result.IsSuccess() {
-		t.Errorf("the result was expected to be NOT be successful")
-		return
-	}
-
-	mistake := result.Mistake()
-	if mistake.Index() != 0 {
-		t.Errorf("the mistake was expected to be at index %d, %d returned", 0, mistake.Index())
-		return
-	}
-
-	index := mistake.Index()
+	index := result.Index()
 	if index != 0 {
-		t.Errorf("the mistake index was expected to be %d, %d returned", 0, index)
+		t.Errorf("the index was expected to be %d, %d returned", 0, index)
 		return
 	}
 
-	expectedPath := []uint{
-		token.Index(),
+	if result.IsSuccess() {
+		t.Errorf("the result was expected to NOT be successful")
+		return
 	}
 
-	retPath := mistake.Path()
-	if !reflect.DeepEqual(expectedPath, retPath) {
-		t.Errorf("the mistake path was expected to be %v, %v returned", expectedPath, retPath)
+	path := result.Path()
+	expectedPath := []uint{0}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
 	}
 }
 
-func TestLexer_withOneLine_withRangeCardinality_withByte_withExactlyMaximumOccurences_Success(t *testing.T) {
+func TestLexer_withOneLine_withRangeCardinality_withByte_withExactlyMaximumOccurences_isSuccess(t *testing.T) {
 	tokenIndex := uint(0)
 	minimum := uint(2)
 	maximum := uint(5)
@@ -335,19 +416,26 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withExactlyMaximumOccur
 		return
 	}
 
-	if !result.IsSuccess() {
-		t.Errorf("the result was expected to be be successful")
+	index := result.Index()
+	if index != 5 {
+		t.Errorf("the index was expected to be %d, %d returned", 5, index)
 		return
 	}
 
-	success := result.Success()
-	if success.HasIndex() {
-		t.Errorf("the success was expected to NOT contain an index")
+	if !result.IsSuccess() {
+		t.Errorf("the result was expected to be successful")
+		return
+	}
+
+	path := result.Path()
+	expectedPath := []uint{0}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
 	}
 }
 
-func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_Success(t *testing.T) {
+func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_isSuccess(t *testing.T) {
 	tokenIndex := uint(0)
 	minimum := uint(2)
 	maximum := uint(5)
@@ -362,14 +450,21 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_S
 		return
 	}
 
-	if !result.IsSuccess() {
-		t.Errorf("the result was expected to be be successful")
+	index := result.Index()
+	if index != 4 {
+		t.Errorf("the index was expected to be %d, %d returned", 4, index)
 		return
 	}
 
-	success := result.Success()
-	if success.HasIndex() {
-		t.Errorf("the success was expected to NOT contain an index")
+	if !result.IsSuccess() {
+		t.Errorf("the result was expected to be successful")
+		return
+	}
+
+	path := result.Path()
+	expectedPath := []uint{0}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
 	}
 }

@@ -3,14 +3,15 @@ package results
 import "errors"
 
 type builder struct {
-	mistake Mistake
-	success Success
+	pIndex    *uint
+	path      []uint
+	isSuccess bool
 }
 
 func createBuilder() Builder {
 	out := builder{
-		mistake: nil,
-		success: nil,
+		pIndex: nil,
+		path:   nil,
 	}
 
 	return &out
@@ -21,27 +22,37 @@ func (app *builder) Create() Builder {
 	return createBuilder()
 }
 
-// WithMistake adds a mistake to the builder
-func (app *builder) WithMistake(mistake Mistake) Builder {
-	app.mistake = mistake
+// WithIndex adds an index to the builder
+func (app *builder) WithIndex(index uint) Builder {
+	app.pIndex = &index
 	return app
 }
 
-// WithSuccess adds a success to the builder
-func (app *builder) WithSuccess(success Success) Builder {
-	app.success = success
+// WithPath adds a path to the builder
+func (app *builder) WithPath(path []uint) Builder {
+	app.path = path
+	return app
+}
+
+// IsSuccess flags the builder as a success
+func (app *builder) IsSuccess() Builder {
+	app.isSuccess = true
 	return app
 }
 
 // Now builds a new Result instance
 func (app *builder) Now() (Result, error) {
-	if app.mistake != nil {
-		return createResultWithMistake(app.mistake), nil
+	if app.pIndex == nil {
+		return nil, errors.New("the index is mandatory in order to build a Result instance")
 	}
 
-	if app.success != nil {
-		return createResultWithSuccess(app.success), nil
+	if app.path != nil && len(app.path) <= 0 {
+		app.path = nil
 	}
 
-	return nil, errors.New("the Result is invalid")
+	if app.path == nil {
+		return nil, errors.New("there must be at least 1 element in the Path in order to build a Result instance")
+	}
+
+	return createResult(*app.pIndex, app.path, app.isSuccess), nil
 }
