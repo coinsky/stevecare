@@ -3,7 +3,35 @@ package applications
 import (
 	"reflect"
 	"testing"
+
+	"github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 )
+
+func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_Success(t *testing.T) {
+	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
+	hyphenTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte("-")[0]), NewCardinalityWithSpecificForTests(1))
+	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
+	tokenLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
+		openTokenElWithCard,
+		hyphenTokenElWithCard,
+		closeTokenElWithCard,
+	})
+
+	rootToken := NewTokenWithSingleLineForTests(uint(3), tokenLine)
+
+	data := []byte("(-)")
+	application := NewApplication()
+	result, err := application.Execute(rootToken, data)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if !result.IsSuccess() {
+		t.Errorf("the result was expected to be successful")
+		return
+	}
+}
 
 func TestLexer_withOneLine_withSpecificCardinality_withByte_Success(t *testing.T) {
 	tokenIndex := uint(0)
@@ -44,7 +72,7 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withExactlyMinOccuren
 	}
 }
 
-func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccurences_returnsSuccess(t *testing.T) {
+func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccurences_Success(t *testing.T) {
 	tokenIndex := uint(0)
 	minimum := uint(2)
 	byteVal := []byte("(")
@@ -64,7 +92,7 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccure
 	}
 }
 
-func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_returnsMistake(t *testing.T) {
+func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_Mistake(t *testing.T) {
 	tokenIndex := uint(0)
 	minimum := uint(2)
 	byteVal := []byte("(")

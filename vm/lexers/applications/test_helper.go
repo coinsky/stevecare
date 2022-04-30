@@ -5,6 +5,26 @@ import (
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 )
 
+// NewCardinalityWithSpecificForTests creates cardinality with specific for tests
+func NewCardinalityWithSpecificForTests(specific uint) cardinality.Cardinality {
+	cardinality, err := cardinality.NewBuilder().Create().WithSpecific(specific).Now()
+	if err != nil {
+		panic(err)
+	}
+
+	return cardinality
+}
+
+// NewLineWithElementWithCardinalityList creates a new line with ElementWithCardinality list for tests
+func NewLineWithElementWithCardinalityList(list []tokens.ElementWithCardinality) tokens.Line {
+	line, err := tokens.NewLineBuilder().Create().WithList(list).Now()
+	if err != nil {
+		panic(err)
+	}
+
+	return line
+}
+
 // NewTokenWithRangeCardinalityWithByteForTests creates a new token with range cardinality with byte for tests
 func NewTokenWithRangeCardinalityWithByteForTests(tokenIndex uint, min uint, max uint, byteVal byte) tokens.Token {
 	element, err := tokens.NewElementBuilder().Create().WithByte(byteVal).Now()
@@ -22,7 +42,7 @@ func NewTokenWithRangeCardinalityWithByteForTests(tokenIndex uint, min uint, max
 		panic(err)
 	}
 
-	return NewTokenWithSigleLineForTests(tokenIndex, element, cardinality)
+	return NewTokenWithSingleElementInSingleLineForTests(tokenIndex, element, cardinality)
 }
 
 // NewTokenWithMinimumCardinalityWithByteForTests creates a new token with min cardinality with byte for tests
@@ -42,7 +62,7 @@ func NewTokenWithMinimumCardinalityWithByteForTests(tokenIndex uint, min uint, b
 		panic(err)
 	}
 
-	return NewTokenWithSigleLineForTests(tokenIndex, element, cardinality)
+	return NewTokenWithSingleElementInSingleLineForTests(tokenIndex, element, cardinality)
 }
 
 // NewTokenWithSpecificCardinalityWithByteForTests creates a new token with specific cardinality with byte for tests
@@ -52,34 +72,29 @@ func NewTokenWithSpecificCardinalityWithByteForTests(tokenIndex uint, specific u
 		panic(err)
 	}
 
-	cardinality, err := cardinality.NewBuilder().Create().WithSpecific(specific).Now()
-	if err != nil {
-		panic(err)
-	}
-
-	return NewTokenWithSigleLineForTests(tokenIndex, element, cardinality)
+	cardinality := NewCardinalityWithSpecificForTests(specific)
+	return NewTokenWithSingleElementInSingleLineForTests(tokenIndex, element, cardinality)
 }
 
-// NewTokenWithSigleLineForTests creates a new token with single line for tests
-func NewTokenWithSigleLineForTests(tokenIndex uint, element tokens.Element, cardinality cardinality.Cardinality) tokens.Token {
-	elementWithCardinality, err := tokens.NewElementWithCardinalityBuilder().
-		Create().
-		WithElement(element).
-		WithCardinality(cardinality).
-		Now()
+// NewTokenWithSpecificCardinalityWithTokenForTests creates a new token with specific cardinality with token for tests
+func NewTokenWithSpecificCardinalityWithTokenForTests(tokenIndex uint, specific uint, token tokens.Token) tokens.Token {
+	cardinality := NewCardinalityWithSpecificForTests(specific)
+	element := NewElementWithTokenForTests(token)
+	return NewTokenWithSingleElementInSingleLineForTests(tokenIndex, element, cardinality)
+}
 
-	if err != nil {
-		panic(err)
-	}
-
-	line, err := tokens.NewLineBuilder().Create().WithList([]tokens.ElementWithCardinality{
+// NewTokenWithSingleElementInSingleLineForTests creates a new token with single element in a singleline for tests
+func NewTokenWithSingleElementInSingleLineForTests(tokenIndex uint, element tokens.Element, cardinality cardinality.Cardinality) tokens.Token {
+	elementWithCardinality := NewElementWithCardinalityWithElementAndCardinalityForTests(element, cardinality)
+	line := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
 		elementWithCardinality,
-	}).Now()
+	})
 
-	if err != nil {
-		panic(err)
-	}
+	return NewTokenWithSingleLineForTests(tokenIndex, line)
+}
 
+// NewTokenWithSingleLineForTests creates a new token with single line for tests
+func NewTokenWithSingleLineForTests(tokenIndex uint, line tokens.Line) tokens.Token {
 	lines, err := tokens.NewLinesBuilder().Create().WithList([]tokens.Line{
 		line,
 	}).Now()
@@ -94,4 +109,35 @@ func NewTokenWithSigleLineForTests(tokenIndex uint, element tokens.Element, card
 	}
 
 	return token
+}
+
+// NewElementWithTokenForTests creates a new element with token for tests
+func NewElementWithTokenForTests(token tokens.Token) tokens.Element {
+	element, err := tokens.NewElementBuilder().Create().WithToken(token).Now()
+	if err != nil {
+		panic(err)
+	}
+
+	return element
+}
+
+// NewElementWithCardinalityWithElementAndCardinalityForTests creates a new elementWithCardinality with element and cardinality for tests
+func NewElementWithCardinalityWithElementAndCardinalityForTests(element tokens.Element, cardinality cardinality.Cardinality) tokens.ElementWithCardinality {
+	elementWithCardinality, err := tokens.NewElementWithCardinalityBuilder().
+		Create().
+		WithElement(element).
+		WithCardinality(cardinality).
+		Now()
+
+	if err != nil {
+		panic(err)
+	}
+
+	return elementWithCardinality
+}
+
+// NewElementWithCardinalityWithTokenAndCardinalityForTests creates a new elementWithCardinality with token and cardinality for tests
+func NewElementWithCardinalityWithTokenAndCardinalityForTests(token tokens.Token, cardinality cardinality.Cardinality) tokens.ElementWithCardinality {
+	element := NewElementWithTokenForTests(token)
+	return NewElementWithCardinalityWithElementAndCardinalityForTests(element, cardinality)
 }

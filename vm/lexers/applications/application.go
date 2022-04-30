@@ -30,62 +30,77 @@ func createApplication(
 
 // Execute executes the lexer application
 func (app *application) Execute(token tokens.Token, data []byte) (results.Result, error) {
-	lines := token.Lines()
-	remaining := app.executeLines(lines, data)
 	builder := app.resultBuilder.Create()
-	if len(remaining) != len(data) {
-		success, err := app.successBuilder.Create().Now()
+	_, _, _, err := app.executeToken(token, data)
+	if err != nil {
+		tokenIndex := token.Index()
+		mistake, err := app.mistakeBuilder.Create().WithIndex(0).WithPath([]uint{
+			tokenIndex,
+		}).Now()
+
 		if err != nil {
 			return nil, err
 		}
 
-		return builder.WithSuccess(success).Now()
+		return builder.WithMistake(mistake).Now()
 	}
 
-	tokenIndex := token.Index()
-	mistake, err := app.mistakeBuilder.Create().WithIndex(0).WithPath([]uint{
-		tokenIndex,
-	}).Now()
-
+	success, err := app.successBuilder.Create().Now()
 	if err != nil {
 		return nil, err
 	}
 
-	return builder.WithMistake(mistake).Now()
+	return builder.WithSuccess(success).Now()
 }
 
-func (app *application) executeLines(lines tokens.Lines, data []byte) []byte {
+func (app *application) executeToken(token tokens.Token, data []byte) (bool, byte, []byte, error) {
+	lines := token.Lines()
+	searchedByte, remaining := app.executeLines(lines, data)
+	if len(remaining) != len(data) {
+		return true, searchedByte, remaining, nil
+	}
+
+	str := fmt.Sprintf("the token (index: %d) could not be matched against the given data because it could not find the byte: %d", token.Index(), searchedByte)
+	return false, searchedByte, remaining, errors.New(str)
+}
+
+func (app *application) executeLines(lines tokens.Lines, data []byte) (byte, []byte) {
+	var lastSearchedByte byte
 	list := lines.List()
 	remainingData := data
 	for _, oneLine := range list {
-		retRemainingData, err := app.executeLine(oneLine, remainingData)
+		searchedByte, retRemainingData, err := app.executeLine(oneLine, remainingData)
 		if err != nil {
 			continue
 		}
 
+		lastSearchedByte = searchedByte
 		remainingData = retRemainingData
 	}
 
-	return remainingData
+	return lastSearchedByte, remainingData
 }
 
-func (app *application) executeLine(line tokens.Line, data []byte) ([]byte, error) {
+func (app *application) executeLine(line tokens.Line, data []byte) (byte, []byte, error) {
+	var lastSearchedByte byte
 	list := line.List()
 	remainingData := data
 	for index, oneElementWithCard := range list {
-		retRemainingData, err := app.executeElementWithCardinality(oneElementWithCard, remainingData)
+		searchedByte, retRemainingData, err := app.executeElementWithCardinality(oneElementWithCard, remainingData)
+		lastSearchedByte = searchedByte
 		if err != nil {
 			str := fmt.Sprintf("there was an error while executing line (index: %d): error: %s", index, err.Error())
-			return remainingData, errors.New(str)
+			return lastSearchedByte, remainingData, errors.New(str)
 		}
 
 		remainingData = retRemainingData
 	}
 
-	return remainingData, nil
+	return lastSearchedByte, remainingData, nil
 }
 
-func (app *application) executeElementWithCardinality(elementWithCard tokens.ElementWithCardinality, data []byte) ([]byte, error) {
+func (app *application) executeElementWithCardinality(elementWithCard tokens.ElementWithCardinality, data []byte) (byte, []byte, error) {
+	var lastSearchedByte byte
 	remainingData := data
 	element := elementWithCard.Element()
 	cardinality := elementWithCard.Cardinality()
@@ -94,24 +109,24 @@ func (app *application) executeElementWithCardinality(elementWithCard tokens.Ele
 		specific := int(*pSpecific)
 		for i := 0; i < specific; i++ {
 			works, searchedByte, retRemainingData, err := app.executeElement(element, remainingData)
+			lastSearchedByte = searchedByte
 			if err != nil {
 				str := fmt.Sprintf("there was an error while trying to find the byte (%d) at specific cardinality (%d) at index: %d, error: %s", searchedByte, specific, i, err.Error())
-				return remainingData, errors.New(str)
+				return lastSearchedByte, remainingData, errors.New(str)
 			}
 
 			if !works {
 				str := fmt.Sprintf("the byte (%d) could not match the data (%d) at specific cardinality (%d) at index: %d", searchedByte, remainingData[0], specific, i)
-				return remainingData, errors.New(str)
+				return lastSearchedByte, remainingData, errors.New(str)
 			}
 
 			remainingData = retRemainingData
 		}
 
-		return remainingData, nil
+		return lastSearchedByte, remainingData, nil
 	}
 
 	cpt := uint(0)
-	var lastSearchedByte byte
 	rnge := cardinality.Range()
 	min := rnge.Min()
 	for {
@@ -124,17 +139,17 @@ func (app *application) executeElementWithCardinality(elementWithCard tokens.Ele
 			pMax := rnge.Max()
 			if cpt >= *pMax {
 				str := fmt.Sprintf("the maximum cardinality (%d) has been reached while trying to find the byte (%d), cpt index: %d", *pMax, lastSearchedByte, cpt)
-				return remainingData, errors.New(str)
+				return lastSearchedByte, remainingData, errors.New(str)
 			}
 		}
 
 		works, searchedByte, retRemainingData, err := app.executeElement(element, remainingData)
+		lastSearchedByte = searchedByte
 		if err != nil {
 			break
 		}
 
 		if !works {
-			lastSearchedByte = searchedByte
 			break
 		}
 
@@ -144,10 +159,10 @@ func (app *application) executeElementWithCardinality(elementWithCard tokens.Ele
 
 	if cpt < min {
 		str := fmt.Sprintf("the minimum cardinality (%d) has not been reached while trying to find the byte (%d), cpt index: %d", min, lastSearchedByte, cpt)
-		return remainingData, errors.New(str)
+		return lastSearchedByte, remainingData, errors.New(str)
 	}
 
-	return remainingData, nil
+	return lastSearchedByte, remainingData, nil
 }
 
 func (app *application) executeElement(element tokens.Element, data []byte) (bool, byte, []byte, error) {
@@ -161,5 +176,6 @@ func (app *application) executeElement(element tokens.Element, data []byte) (boo
 		return false, *pByte, data, errors.New("empty data")
 	}
 
-	panic(errors.New("finish executeElement with Token"))
+	token := element.Token()
+	return app.executeToken(token, data)
 }

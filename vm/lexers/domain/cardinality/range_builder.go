@@ -1,6 +1,9 @@
 package cardinality
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type rangeBuilder struct {
 	pMin *uint
@@ -40,6 +43,11 @@ func (app *rangeBuilder) Now() (Range, error) {
 	}
 
 	if app.pMax != nil {
+		if *app.pMin >= *app.pMax {
+			str := fmt.Sprintf("the minimum (%d), must be smaller than the maximum (%d)", *app.pMin, *app.pMax)
+			return nil, errors.New(str)
+		}
+
 		return createRangeWithMaximum(*app.pMin, app.pMax), nil
 	}
 
