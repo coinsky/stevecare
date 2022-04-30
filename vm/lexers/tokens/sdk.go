@@ -42,7 +42,7 @@ type Line interface {
 type ElementWithCardinalityBuilder interface {
 	Create() ElementWithCardinalityBuilder
 	WithElement(element Element) ElementWithCardinalityBuilder
-	WithCardinality(cardinality ElementWithCardinality) ElementWithCardinalityBuilder
+	WithCardinality(cardinality cardinality.Cardinality) ElementWithCardinalityBuilder
 	Now() (ElementWithCardinality, error)
 }
 
