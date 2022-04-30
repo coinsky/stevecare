@@ -4,14 +4,17 @@ import "errors"
 
 type builder struct {
 	pIndex    *uint
+	pCursor   *uint
 	path      []uint
 	isSuccess bool
 }
 
 func createBuilder() Builder {
 	out := builder{
-		pIndex: nil,
-		path:   nil,
+		pIndex:    nil,
+		pCursor:   nil,
+		path:      nil,
+		isSuccess: false,
 	}
 
 	return &out
@@ -25,6 +28,12 @@ func (app *builder) Create() Builder {
 // WithIndex adds an index to the builder
 func (app *builder) WithIndex(index uint) Builder {
 	app.pIndex = &index
+	return app
+}
+
+// WithCursor adds a cursor to the builder
+func (app *builder) WithCursor(cursor uint) Builder {
+	app.pCursor = &cursor
 	return app
 }
 
@@ -46,6 +55,10 @@ func (app *builder) Now() (Result, error) {
 		return nil, errors.New("the index is mandatory in order to build a Result instance")
 	}
 
+	if app.pCursor == nil {
+		return nil, errors.New("the cursor is mandatory in order to build a Result instance")
+	}
+
 	if app.path != nil && len(app.path) <= 0 {
 		app.path = nil
 	}
@@ -54,5 +67,5 @@ func (app *builder) Now() (Result, error) {
 		return nil, errors.New("there must be at least 1 element in the Path in order to build a Result instance")
 	}
 
-	return createResult(*app.pIndex, app.path, app.isSuccess), nil
+	return createResult(*app.pIndex, *app.pCursor, app.path, app.isSuccess), nil
 }

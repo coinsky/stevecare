@@ -32,15 +32,15 @@ func TestLexer_withReference_withSuccessIndex_isSuccess(t *testing.T) {
 
 	data := []byte("((5<5))567")
 	application := NewApplication()
-	result, err := application.Execute(rootToken, data)
+	result, err := application.Execute(rootToken, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	index := result.Index()
-	if index != 7 {
-		t.Errorf("the index was expected to be %d, %d returned", 7, index)
+	cursor := result.Cursor()
+	if cursor != 7 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 7, cursor)
 		return
 	}
 
@@ -57,7 +57,7 @@ func TestLexer_withReference_withSuccessIndex_isSuccess(t *testing.T) {
 	}
 }
 
-func TestLexer_withReference_withSuccessIndex_notEnoughData_isNotSuccess(t *testing.T) {
+func TestLexer_withReference_withSuccessIndex_notEnoughData_cannotHavePrefix_isNotSuccess(t *testing.T) {
 	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
 	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
 	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
@@ -82,7 +82,7 @@ func TestLexer_withReference_withSuccessIndex_notEnoughData_isNotSuccess(t *test
 
 	data := []byte("((5<5)")
 	application := NewApplication()
-	result, err := application.Execute(rootToken, data)
+	result, err := application.Execute(rootToken, data, false)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -90,7 +90,13 @@ func TestLexer_withReference_withSuccessIndex_notEnoughData_isNotSuccess(t *test
 
 	index := result.Index()
 	if index != 0 {
-		t.Errorf("the index was expected to be %d, %d returned", 0, index)
+		t.Errorf("the index was expected to be %d,%d returned", 0, index)
+		return
+	}
+
+	cursor := result.Cursor()
+	if cursor != 0 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 0, cursor)
 		return
 	}
 
@@ -101,6 +107,62 @@ func TestLexer_withReference_withSuccessIndex_notEnoughData_isNotSuccess(t *test
 
 	path := result.Path()
 	expectedPath := []uint{5}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
+		return
+	}
+}
+
+func TestLexer_withReference_withSuccessIndex_notEnoughData_withPrefix_isSuccess(t *testing.T) {
+	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
+	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
+	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
+	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
+
+	conditionFirstLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
+		openTokenElWithCard,
+		NewElementWithCardinalityWithReferenceAndCardinalityForTests(uint(4), uint(5), NewCardinalityWithSpecificForTests(1)),
+		closeTokenElWithCard,
+	})
+
+	conditionSecondLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
+		fiveTokenElWithCard,
+		smallerThanTokenElWithCard,
+		fiveTokenElWithCard,
+	})
+
+	rootToken := NewTokenWithLinesForTests(uint(5), []tokens.Line{
+		conditionFirstLine,
+		conditionSecondLine,
+	})
+
+	data := []byte("((5<5)")
+	application := NewApplication()
+	result, err := application.Execute(rootToken, data, true)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	index := result.Index()
+	if index != 1 {
+		t.Errorf("the index was expected to be %d,%d returned", 1, index)
+		return
+	}
+
+	cursor := result.Cursor()
+	if cursor != 6 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 6, cursor)
+		return
+	}
+
+	if !result.IsSuccess() {
+		t.Errorf("the result was expected to be successful")
+		return
+	}
+
+	path := result.Path()
+	expectedPath := []uint{5, 0, 5, 2, 3, 2, 1}
 	if !reflect.DeepEqual(expectedPath, path) {
 		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
@@ -118,15 +180,15 @@ func TestLexer_withReference_isInfiniteRecursive_isNotSuccess(t *testing.T) {
 
 	data := []byte("((5<5))")
 	application := NewApplication()
-	result, err := application.Execute(rootToken, data)
+	result, err := application.Execute(rootToken, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	index := result.Index()
-	if index != 0 {
-		t.Errorf("the index was expected to be %d, %d returned", 0, index)
+	cursor := result.Cursor()
+	if cursor != 0 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 0, cursor)
 		return
 	}
 
@@ -143,7 +205,7 @@ func TestLexer_withReference_isInfiniteRecursive_isNotSuccess(t *testing.T) {
 	}
 }
 
-func TestLexer_withUndeclaredReference_isNotSuccess(t *testing.T) {
+func TestLexer_withUndeclaredReference_withPrefix_isSuccess(t *testing.T) {
 	invalidReferenceIndex := uint(20)
 	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
 	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
@@ -169,25 +231,31 @@ func TestLexer_withUndeclaredReference_isNotSuccess(t *testing.T) {
 
 	data := []byte("((5<5))")
 	application := NewApplication()
-	result, err := application.Execute(rootToken, data)
+	result, err := application.Execute(rootToken, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
 	index := result.Index()
-	if index != 0 {
-		t.Errorf("the index was expected to be %d, %d returned", 0, index)
+	if index != 2 {
+		t.Errorf("the index was expected to be %d, %d returned", 2, index)
 		return
 	}
 
-	if result.IsSuccess() {
-		t.Errorf("the result was expected to NOT be successful")
+	cursor := result.Cursor()
+	if cursor != 5 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 5, cursor)
+		return
+	}
+
+	if !result.IsSuccess() {
+		t.Errorf("the result was expected to be successful")
 		return
 	}
 
 	path := result.Path()
-	expectedPath := []uint{5}
+	expectedPath := []uint{5, 2, 3, 2}
 	if !reflect.DeepEqual(expectedPath, path) {
 		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
@@ -210,15 +278,15 @@ func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_withSuccessInde
 
 	data := []byte("(-)345")
 	application := NewApplication()
-	result, err := application.Execute(rootToken, data)
+	result, err := application.Execute(rootToken, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	index := result.Index()
-	if index != 3 {
-		t.Errorf("the index was expected to be %d, %d returned", 3, index)
+	cursor := result.Cursor()
+	if cursor != 3 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 3, cursor)
 		return
 	}
 
@@ -243,15 +311,15 @@ func TestLexer_withOneLine_withSpecificCardinality_withByte_withoutSuccessIndex_
 
 	application := NewApplication()
 	token := NewTokenWithSpecificCardinalityWithByteForTests(tokenIndex, specific, byteVal[0])
-	result, err := application.Execute(token, byteVal)
+	result, err := application.Execute(token, byteVal, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	index := result.Index()
-	if index != 1 {
-		t.Errorf("the index was expected to be %d, %d returned", 1, index)
+	cursor := result.Cursor()
+	if cursor != 1 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 1, cursor)
 		return
 	}
 
@@ -276,15 +344,15 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withExactlyMinOccuren
 
 	application := NewApplication()
 	token := NewTokenWithMinimumCardinalityWithByteForTests(tokenIndex, minimum, byteVal[0])
-	result, err := application.Execute(token, data)
+	result, err := application.Execute(token, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	index := result.Index()
-	if index != 2 {
-		t.Errorf("the index was expected to be %d, %d returned", 2, index)
+	cursor := result.Cursor()
+	if cursor != 2 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 2, cursor)
 		return
 	}
 
@@ -309,15 +377,15 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccure
 
 	application := NewApplication()
 	token := NewTokenWithMinimumCardinalityWithByteForTests(tokenIndex, minimum, byteVal[0])
-	result, err := application.Execute(token, data)
+	result, err := application.Execute(token, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	index := result.Index()
-	if index != 3 {
-		t.Errorf("the index was expected to be %d, %d returned", 3, index)
+	cursor := result.Cursor()
+	if cursor != 3 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 3, cursor)
 		return
 	}
 
@@ -342,15 +410,15 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_i
 
 	application := NewApplication()
 	token := NewTokenWithMinimumCardinalityWithByteForTests(tokenIndex, minimum, byteVal[0])
-	result, err := application.Execute(token, data)
+	result, err := application.Execute(token, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	index := result.Index()
-	if index != 0 {
-		t.Errorf("the index was expected to be %d, %d returned", 0, index)
+	cursor := result.Cursor()
+	if cursor != 0 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 0, cursor)
 		return
 	}
 
@@ -367,7 +435,7 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_i
 	}
 }
 
-func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_isNotSuccess(t *testing.T) {
+func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_withPrefix_isSuccess(t *testing.T) {
 	tokenIndex := uint(0)
 	minimum := uint(2)
 	maximum := uint(5)
@@ -376,20 +444,26 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_is
 
 	application := NewApplication()
 	token := NewTokenWithRangeCardinalityWithByteForTests(tokenIndex, minimum, maximum, byteVal[0])
-	result, err := application.Execute(token, data)
+	result, err := application.Execute(token, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
 	index := result.Index()
-	if index != 0 {
-		t.Errorf("the index was expected to be %d, %d returned", 0, index)
+	if index != 1 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 1, index)
 		return
 	}
 
-	if result.IsSuccess() {
-		t.Errorf("the result was expected to NOT be successful")
+	cursor := result.Cursor()
+	if cursor != 6 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 6, cursor)
+		return
+	}
+
+	if !result.IsSuccess() {
+		t.Errorf("the result was expected to be successful")
 		return
 	}
 
@@ -410,15 +484,15 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withExactlyMaximumOccur
 
 	application := NewApplication()
 	token := NewTokenWithRangeCardinalityWithByteForTests(tokenIndex, minimum, maximum, byteVal[0])
-	result, err := application.Execute(token, data)
+	result, err := application.Execute(token, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	index := result.Index()
-	if index != 5 {
-		t.Errorf("the index was expected to be %d, %d returned", 5, index)
+	cursor := result.Cursor()
+	if cursor != 5 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 5, cursor)
 		return
 	}
 
@@ -444,15 +518,15 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_i
 
 	application := NewApplication()
 	token := NewTokenWithRangeCardinalityWithByteForTests(tokenIndex, minimum, maximum, byteVal[0])
-	result, err := application.Execute(token, data)
+	result, err := application.Execute(token, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	index := result.Index()
-	if index != 4 {
-		t.Errorf("the index was expected to be %d, %d returned", 4, index)
+	cursor := result.Cursor()
+	if cursor != 4 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 4, cursor)
 		return
 	}
 

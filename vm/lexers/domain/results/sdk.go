@@ -9,6 +9,7 @@ func NewBuilder() Builder {
 type Builder interface {
 	Create() Builder
 	WithIndex(index uint) Builder
+	WithCursor(cursor uint) Builder
 	WithPath(path []uint) Builder
 	IsSuccess() Builder
 	Now() (Result, error)
@@ -17,6 +18,7 @@ type Builder interface {
 // Result represents a mistake
 type Result interface {
 	Index() uint
+	Cursor() uint
 	Path() []uint
 	IsSuccess() bool
 }

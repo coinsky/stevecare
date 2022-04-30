@@ -13,5 +13,5 @@ func NewApplication() Application {
 
 // Application represents a lexer application
 type Application interface {
-	Execute(token tokens.Token, data []byte) (results.Result, error)
+	Execute(token tokens.Token, data []byte, canHavePrefix bool) (results.Result, error)
 }

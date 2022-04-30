@@ -23,16 +23,38 @@ func createApplication(
 }
 
 // Execute executes the lexer application
-func (app *application) Execute(token tokens.Token, data []byte) (results.Result, error) {
-	lengthData := len(data)
-	remaining, path, err := app.executeToken(token, data, []uint{}, map[uint]*tokenData{})
-	index := uint(lengthData - len(remaining))
-	builder := app.resultBuilder.Create().WithIndex(index).WithPath(path)
-	if err != nil {
-		return builder.Now()
+func (app *application) Execute(token tokens.Token, data []byte, canHavePrefix bool) (results.Result, error) {
+	if canHavePrefix {
+		index := uint(0)
+		reaminingData := data
+		for {
+			if len(reaminingData) <= 0 {
+				break
+			}
+
+			cursor, path, isSuccess := app.executeOnce(token, reaminingData, index)
+			if isSuccess {
+				return app.resultBuilder.Create().WithIndex(index).WithCursor(cursor).WithPath(path).IsSuccess().Now()
+			}
+
+			reaminingData = reaminingData[1:]
+			index++
+		}
 	}
 
-	return builder.IsSuccess().Now()
+	cursor, path, _ := app.executeOnce(token, data, 0)
+	return app.resultBuilder.Create().WithIndex(0).WithCursor(cursor).WithPath(path).Now()
+}
+
+func (app *application) executeOnce(token tokens.Token, data []byte, index uint) (uint, []uint, bool) {
+	lengthData := len(data) + int(index)
+	remaining, path, err := app.executeToken(token, data, []uint{}, map[uint]*tokenData{})
+	cursor := uint(lengthData - len(remaining))
+	if err != nil {
+		return cursor, path, false
+	}
+
+	return cursor, path, true
 }
 
 func (app *application) executeReference(refIndex uint, data []byte, path []uint, prevTokenData map[uint]*tokenData) ([]byte, []uint, error) {
