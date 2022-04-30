@@ -28,5 +28,5 @@ type RangeBuilder interface {
 type Range interface {
 	Min() uint
 	HasMax() bool
-	Max() uint
+	Max() *uint
 }
