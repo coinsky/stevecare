@@ -3,14 +3,16 @@ package tokens
 import "errors"
 
 type elementBuilder struct {
-	pByte *byte
-	token Token
+	pByte      *byte
+	token      Token
+	pReference *uint
 }
 
 func createElementBuilder() ElementBuilder {
 	out := elementBuilder{
-		pByte: nil,
-		token: nil,
+		pByte:      nil,
+		token:      nil,
+		pReference: nil,
 	}
 
 	return &out
@@ -33,6 +35,12 @@ func (app *elementBuilder) WithToken(token Token) ElementBuilder {
 	return app
 }
 
+// WithReference adds a toke nreference to the builder
+func (app *elementBuilder) WithReference(reference uint) ElementBuilder {
+	app.pReference = &reference
+	return app
+}
+
 // Now builds a new Element instance
 func (app *elementBuilder) Now() (Element, error) {
 	if app.pByte != nil {
@@ -41,6 +49,10 @@ func (app *elementBuilder) Now() (Element, error) {
 
 	if app.token != nil {
 		return createElementWithToken(app.token), nil
+	}
+
+	if app.pReference != nil {
+		return createElementWithReference(app.pReference), nil
 	}
 
 	return nil, errors.New("the Element is invalid")

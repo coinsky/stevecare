@@ -84,6 +84,7 @@ type ElementBuilder interface {
 	Create() ElementBuilder
 	WithByte(byteValue byte) ElementBuilder
 	WithToken(token Token) ElementBuilder
+	WithReference(reference uint) ElementBuilder
 	Now() (Element, error)
 }
 
@@ -93,4 +94,6 @@ type Element interface {
 	Byte() *byte
 	IsToken() bool
 	Token() Token
+	IsReference() bool
+	Reference() *uint
 }

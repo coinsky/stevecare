@@ -25,6 +25,16 @@ func NewLineWithElementWithCardinalityList(list []tokens.ElementWithCardinality)
 	return line
 }
 
+// NewElementWithCardinalityWithReferenceAndCardinalityForTests creates a new elementWithCardinality with token reference and cardinality for  tests
+func NewElementWithCardinalityWithReferenceAndCardinalityForTests(tokenIndex uint, refIndex uint, cardinality cardinality.Cardinality) tokens.ElementWithCardinality {
+	element, err := tokens.NewElementBuilder().Create().WithReference(refIndex).Now()
+	if err != nil {
+		panic(err)
+	}
+
+	return NewElementWithCardinalityWithElementAndCardinalityForTests(element, cardinality)
+}
+
 // NewTokenWithRangeCardinalityWithByteForTests creates a new token with range cardinality with byte for tests
 func NewTokenWithRangeCardinalityWithByteForTests(tokenIndex uint, min uint, max uint, byteVal byte) tokens.Token {
 	element, err := tokens.NewElementBuilder().Create().WithByte(byteVal).Now()
@@ -90,15 +100,14 @@ func NewTokenWithSingleElementInSingleLineForTests(tokenIndex uint, element toke
 		elementWithCardinality,
 	})
 
-	return NewTokenWithSingleLineForTests(tokenIndex, line)
+	return NewTokenWithLinesForTests(tokenIndex, []tokens.Line{
+		line,
+	})
 }
 
-// NewTokenWithSingleLineForTests creates a new token with single line for tests
-func NewTokenWithSingleLineForTests(tokenIndex uint, line tokens.Line) tokens.Token {
-	lines, err := tokens.NewLinesBuilder().Create().WithList([]tokens.Line{
-		line,
-	}).Now()
-
+// NewTokenWithLinesForTests creates a new token with lines for tests
+func NewTokenWithLinesForTests(tokenIndex uint, linesList []tokens.Line) tokens.Token {
+	lines, err := tokens.NewLinesBuilder().Create().WithList(linesList).Now()
 	if err != nil {
 		panic(err)
 	}
