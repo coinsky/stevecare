@@ -30,11 +30,13 @@ func createApplication(
 
 // Execute executes the lexer application
 func (app *application) Execute(token tokens.Token, data []byte) (results.Result, error) {
+	lengthData := len(data)
 	builder := app.resultBuilder.Create()
-	_, _, _, err := app.executeToken(token, data)
+	_, _, remaining, err := app.executeToken(token, data)
+	index := uint(lengthData - len(remaining))
 	if err != nil {
 		tokenIndex := token.Index()
-		mistake, err := app.mistakeBuilder.Create().WithIndex(0).WithPath([]uint{
+		mistake, err := app.mistakeBuilder.Create().WithIndex(index).WithPath([]uint{
 			tokenIndex,
 		}).Now()
 
@@ -45,7 +47,12 @@ func (app *application) Execute(token tokens.Token, data []byte) (results.Result
 		return builder.WithMistake(mistake).Now()
 	}
 
-	success, err := app.successBuilder.Create().Now()
+	successBuilder := app.successBuilder.Create()
+	if index < uint(lengthData) {
+		successBuilder.WithIndex(index)
+	}
+
+	success, err := successBuilder.Now()
 	if err != nil {
 		return nil, err
 	}

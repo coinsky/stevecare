@@ -7,7 +7,7 @@ import (
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 )
 
-func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_Success(t *testing.T) {
+func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_withSuccessIndex_Success(t *testing.T) {
 	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
 	hyphenTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte("-")[0]), NewCardinalityWithSpecificForTests(1))
 	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
@@ -19,7 +19,7 @@ func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_Success(t *test
 
 	rootToken := NewTokenWithSingleLineForTests(uint(3), tokenLine)
 
-	data := []byte("(-)")
+	data := []byte("(-)345")
 	application := NewApplication()
 	result, err := application.Execute(rootToken, data)
 	if err != nil {
@@ -31,9 +31,22 @@ func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_Success(t *test
 		t.Errorf("the result was expected to be successful")
 		return
 	}
+
+	success := result.Success()
+	if !success.HasIndex() {
+		t.Errorf("the success was expected to contain an index")
+		return
+	}
+
+	pIndex := success.Index()
+	if *pIndex != 3 {
+		t.Errorf("the index was expected to be %d, %d returned", 3, *pIndex)
+		return
+	}
+
 }
 
-func TestLexer_withOneLine_withSpecificCardinality_withByte_Success(t *testing.T) {
+func TestLexer_withOneLine_withSpecificCardinality_withByte_withoutSuccessIndex_Success(t *testing.T) {
 	tokenIndex := uint(0)
 	specific := uint(1)
 	byteVal := []byte("(")
@@ -48,6 +61,12 @@ func TestLexer_withOneLine_withSpecificCardinality_withByte_Success(t *testing.T
 
 	if !result.IsSuccess() {
 		t.Errorf("the result was expected to be successful")
+		return
+	}
+
+	success := result.Success()
+	if success.HasIndex() {
+		t.Errorf("the success was expected to NOT contain an index")
 		return
 	}
 }
@@ -70,6 +89,12 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withExactlyMinOccuren
 		t.Errorf("the result was expected to be successful")
 		return
 	}
+
+	success := result.Success()
+	if success.HasIndex() {
+		t.Errorf("the success was expected to NOT contain an index")
+		return
+	}
 }
 
 func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccurences_Success(t *testing.T) {
@@ -88,6 +113,12 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccure
 
 	if !result.IsSuccess() {
 		t.Errorf("the result was expected to be successful")
+		return
+	}
+
+	success := result.Success()
+	if success.HasIndex() {
+		t.Errorf("the success was expected to NOT contain an index")
 		return
 	}
 }
@@ -117,6 +148,12 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_M
 		return
 	}
 
+	index := mistake.Index()
+	if index != 0 {
+		t.Errorf("the mistake index was expected to be %d, %d returned", 0, index)
+		return
+	}
+
 	expectedPath := []uint{
 		token.Index(),
 	}
@@ -128,7 +165,7 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_M
 	}
 }
 
-func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_returnsMistake(t *testing.T) {
+func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_Mistake(t *testing.T) {
 	tokenIndex := uint(0)
 	minimum := uint(2)
 	maximum := uint(5)
@@ -154,6 +191,12 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_re
 		return
 	}
 
+	index := mistake.Index()
+	if index != 0 {
+		t.Errorf("the mistake index was expected to be %d, %d returned", 0, index)
+		return
+	}
+
 	expectedPath := []uint{
 		token.Index(),
 	}
@@ -165,7 +208,7 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_re
 	}
 }
 
-func TestLexer_withOneLine_withRangeCardinality_withByte_withExactlyMaximumOccurences_returnsSuccess(t *testing.T) {
+func TestLexer_withOneLine_withRangeCardinality_withByte_withExactlyMaximumOccurences_Success(t *testing.T) {
 	tokenIndex := uint(0)
 	minimum := uint(2)
 	maximum := uint(5)
@@ -184,9 +227,15 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withExactlyMaximumOccur
 		t.Errorf("the result was expected to be be successful")
 		return
 	}
+
+	success := result.Success()
+	if success.HasIndex() {
+		t.Errorf("the success was expected to NOT contain an index")
+		return
+	}
 }
 
-func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_returnsSuccess(t *testing.T) {
+func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_Success(t *testing.T) {
 	tokenIndex := uint(0)
 	minimum := uint(2)
 	maximum := uint(5)
@@ -203,6 +252,12 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_r
 
 	if !result.IsSuccess() {
 		t.Errorf("the result was expected to be be successful")
+		return
+	}
+
+	success := result.Success()
+	if success.HasIndex() {
+		t.Errorf("the success was expected to NOT contain an index")
 		return
 	}
 }
