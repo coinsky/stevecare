@@ -1,5 +1,20 @@
 package results
 
+// NewBuilder creates a new builder instance
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewMistakeBuilder creates a new mistake builder
+func NewMistakeBuilder() MistakeBuilder {
+	return createMistakeBuilder()
+}
+
+// NewSuccessBuilder creates a new success builder
+func NewSuccessBuilder() SuccessBuilder {
+	return createSuccessBuilder()
+}
+
 // Builder represents the builder
 type Builder interface {
 	Create() Builder
