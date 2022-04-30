@@ -63,7 +63,7 @@ type ElementBuilder interface {
 // Element represents a token element
 type Element interface {
 	IsByte() bool
-	Byte() byte
+	Byte() *byte
 	IsToken() bool
 	Token() Token
 }
