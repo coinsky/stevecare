@@ -35,7 +35,7 @@ func (app *rangeBuilder) WithMaximum(max uint) RangeBuilder {
 
 // Now builds a new Range instance
 func (app *rangeBuilder) Now() (Range, error) {
-	if app.pMin != nil {
+	if app.pMin == nil {
 		return nil, errors.New("the minimum is mandatory in order to build a Range instance")
 	}
 

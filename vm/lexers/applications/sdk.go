@@ -9,7 +9,8 @@ import (
 func NewApplication() Application {
 	resultBuilder := results.NewBuilder()
 	successBuilder := results.NewSuccessBuilder()
-	return createApplication(resultBuilder, successBuilder)
+	mistakeBuilder := results.NewMistakeBuilder()
+	return createApplication(resultBuilder, successBuilder, mistakeBuilder)
 }
 
 // Application represents a lexer application
