@@ -2,6 +2,11 @@ package channels
 
 import "github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 
+// NewBothConditionBuilder creates a new both conditon builder
+func NewBothConditionBuilder() BothConditionBuilder {
+	return createBothConditionBuilder()
+}
+
 // Builder represents a channels builder
 type Builder interface {
 	Create() Builder
@@ -34,8 +39,8 @@ type ConditionBuilder interface {
 	Create() ConditionBuilder
 	WithAnd(and BothCondition) ConditionBuilder
 	WithOr(or BothCondition) ConditionBuilder
-	WithPrevious(prev tokens.Tokens) ConditionBuilder
-	WithNext(next tokens.Tokens) ConditionBuilder
+	WithPrevious(prev tokens.Token) ConditionBuilder
+	WithNext(next tokens.Token) ConditionBuilder
 	Now() (Condition, error)
 }
 
@@ -46,21 +51,21 @@ type Condition interface {
 	IsOr() bool
 	Or() BothCondition
 	IsPrevious() bool
-	Previous() tokens.Tokens
+	Previous() tokens.Token
 	IsNext() bool
-	Next() tokens.Tokens
+	Next() tokens.Token
 }
 
 // BothConditionBuilder represents a both condition builder
 type BothConditionBuilder interface {
 	Create() BothConditionBuilder
-	WithPrevious(prev tokens.Tokens) BothConditionBuilder
-	WithNext(next tokens.Tokens) BothConditionBuilder
+	WithPrevious(prev tokens.Token) BothConditionBuilder
+	WithNext(next tokens.Token) BothConditionBuilder
 	Now() (BothCondition, error)
 }
 
 // BothCondition represents an and or or condition
 type BothCondition interface {
-	Previous() tokens.Tokens
-	Next() tokens.Tokens
+	Previous() tokens.Token
+	Next() tokens.Token
 }
