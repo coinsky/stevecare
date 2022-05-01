@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/steve-care-software/stevecare/vm/lexers/domain/grammars"
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/results"
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 )
@@ -23,7 +24,8 @@ func createApplication(
 }
 
 // Execute executes the lexer application
-func (app *application) Execute(token tokens.Token, data []byte, canHavePrefix bool) (results.Result, error) {
+func (app *application) Execute(grammar grammars.Grammar, data []byte, canHavePrefix bool) (results.Result, error) {
+	token := grammar.Root()
 	if canHavePrefix {
 		index := uint(0)
 		reaminingData := data

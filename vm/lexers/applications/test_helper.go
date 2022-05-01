@@ -2,8 +2,19 @@ package applications
 
 import (
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/cardinality"
+	"github.com/steve-care-software/stevecare/vm/lexers/domain/grammars"
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 )
+
+// NewGrammarForTests creates a new grammar for tests
+func NewGrammarForTests(root tokens.Token) grammars.Grammar {
+	ins, err := grammars.NewBuilder().Create().WithRoot(root).Now()
+	if err != nil {
+		panic(err)
+	}
+
+	return ins
+}
 
 // NewCardinalityWithSpecificForTests creates cardinality with specific for tests
 func NewCardinalityWithSpecificForTests(specific uint) cardinality.Cardinality {
