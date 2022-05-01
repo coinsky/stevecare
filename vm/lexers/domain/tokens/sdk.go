@@ -2,6 +2,11 @@ package tokens
 
 import "github.com/steve-care-software/stevecare/vm/lexers/domain/cardinality"
 
+// NewBuilder creates a new tokens builder instance
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
 // NewTokenBuilder creates a new token builder instance
 func NewTokenBuilder() TokenBuilder {
 	return createTokenBuilder()
