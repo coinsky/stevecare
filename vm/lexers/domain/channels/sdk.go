@@ -2,6 +2,11 @@ package channels
 
 import "github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 
+// NewConditionBuilder creates a new condition builder
+func NewConditionBuilder() ConditionBuilder {
+	return createConditionBuilder()
+}
+
 // NewBothConditionBuilder creates a new both conditon builder
 func NewBothConditionBuilder() BothConditionBuilder {
 	return createBothConditionBuilder()
@@ -39,6 +44,7 @@ type ConditionBuilder interface {
 	Create() ConditionBuilder
 	WithAnd(and BothCondition) ConditionBuilder
 	WithOr(or BothCondition) ConditionBuilder
+	WithXor(xor BothCondition) ConditionBuilder
 	WithPrevious(prev tokens.Token) ConditionBuilder
 	WithNext(next tokens.Token) ConditionBuilder
 	Now() (Condition, error)
@@ -50,6 +56,8 @@ type Condition interface {
 	And() BothCondition
 	IsOr() bool
 	Or() BothCondition
+	IsXor() bool
+	Xor() BothCondition
 	IsPrevious() bool
 	Previous() tokens.Token
 	IsNext() bool
