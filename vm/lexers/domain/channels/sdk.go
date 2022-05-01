@@ -2,6 +2,11 @@ package channels
 
 import "github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 
+// NewBuilder creates a new builder instance
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
 // NewChannelBuilder creates a new channel builder
 func NewChannelBuilder() ChannelBuilder {
 	return createChannelBuilder()
