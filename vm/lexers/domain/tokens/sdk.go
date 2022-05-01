@@ -2,9 +2,9 @@ package tokens
 
 import "github.com/steve-care-software/stevecare/vm/lexers/domain/cardinality"
 
-// NewBuilder creates a new builder instance
-func NewBuilder() Builder {
-	return createBuilder()
+// NewTokenBuilder creates a new token builder instance
+func NewTokenBuilder() TokenBuilder {
+	return createTokenBuilder()
 }
 
 // NewLinesBuilder creates a new lines builder
@@ -27,11 +27,23 @@ func NewElementBuilder() ElementBuilder {
 	return createElementBuilder()
 }
 
-// Builder represents the token builder
+// Builder represents a tokens builder
 type Builder interface {
 	Create() Builder
-	WithIndex(index uint) Builder
-	WithLines(lines Lines) Builder
+	WithList(list []Token) Builder
+	Now() (Tokens, error)
+}
+
+// Tokens represents a list of token
+type Tokens interface {
+	List() []Token
+}
+
+// TokenBuilder represents the token builder
+type TokenBuilder interface {
+	Create() TokenBuilder
+	WithIndex(index uint) TokenBuilder
+	WithLines(lines Lines) TokenBuilder
 	Now() (Token, error)
 }
 

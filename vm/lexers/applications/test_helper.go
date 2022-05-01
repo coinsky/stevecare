@@ -105,7 +105,7 @@ func NewTokenWithLinesForTests(tokenIndex uint, linesList []tokens.Line) tokens.
 		panic(err)
 	}
 
-	token, err := tokens.NewBuilder().Create().WithIndex(tokenIndex).WithLines(lines).Now()
+	token, err := tokens.NewTokenBuilder().Create().WithIndex(tokenIndex).WithLines(lines).Now()
 	if err != nil {
 		panic(err)
 	}
