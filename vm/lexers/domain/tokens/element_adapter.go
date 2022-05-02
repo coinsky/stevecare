@@ -22,8 +22,8 @@ func createElementAdapter(
 
 // ToElement converts data to an element
 func (app *elementAdapter) ToElement(data []byte) (Element, []byte, error) {
-	if len(data) <= 0 {
-		return nil, nil, errors.New("the data must contain at least 1 element in order be converted to an Element instance")
+	if len(data) <= 1 {
+		return nil, nil, errors.New("the data must contain at least 2 elements in order be converted to an Element instance")
 	}
 
 	if data[0] == TokenPrefix {
@@ -67,10 +67,15 @@ func (app *elementAdapter) ToElement(data []byte) (Element, []byte, error) {
 		return ins, remaining, nil
 	}
 
-	ins, err := app.elementBuilder.Create().WithByte(data[0]).Now()
-	if err != nil {
-		return nil, nil, err
+	if data[0] == BytePrefix {
+		ins, err := app.elementBuilder.Create().WithByte(data[1]).Now()
+		if err != nil {
+			return nil, nil, err
+		}
+
+		return ins, data[2:], nil
 	}
 
-	return ins, data[1:], nil
+	str := fmt.Sprintf("the data prefix (%d) is invalid and therefore cannot be converted to an Element instance", data[0])
+	return nil, nil, errors.New(str)
 }

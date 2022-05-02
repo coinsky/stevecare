@@ -10,6 +10,7 @@ func TestElementAdapter_withByte_isSuccess(t *testing.T) {
 	expectedRemaining := []byte{0, 3, 4, 5}
 	byteValue := uint8(8)
 	elementData := []byte{
+		BytePrefix,
 		byteValue,
 	}
 

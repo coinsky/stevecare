@@ -2,6 +2,9 @@ package tokens
 
 import "github.com/steve-care-software/stevecare/vm/lexers/domain/cardinality"
 
+// BytePrefix represents the byte prefix (ascii of '%')
+const BytePrefix = 37
+
 // TokenPrefix represents the token prefix (ascii of '$')
 const TokenPrefix = 36
 
@@ -26,6 +29,14 @@ func NewLinesBuilder() LinesBuilder {
 // NewLineBuilder creates a new line builder
 func NewLineBuilder() LineBuilder {
 	return createLineBuilder()
+}
+
+// NewElementWithCardinalityAdapter creates a new element with cardinality adapter
+func NewElementWithCardinalityAdapter() ElementWithCardinalityAdapter {
+	builder := NewElementWithCardinalityBuilder()
+	elementAdapter := NewElementAdapter()
+	cardinalityAdapter := cardinality.NewAdapter()
+	return createElementWithCardinalityAdapter(builder, elementAdapter, cardinalityAdapter)
 }
 
 // NewElementWithCardinalityBuilder creates a new element with cardinality builder
@@ -97,6 +108,11 @@ type LineBuilder interface {
 // Line represents token lines
 type Line interface {
 	List() []ElementWithCardinality
+}
+
+// ElementWithCardinalityAdapter represents the element with cardinality adapter
+type ElementWithCardinalityAdapter interface {
+	ToElementWithCardinality(data []byte) (ElementWithCardinality, []byte, error)
 }
 
 // ElementWithCardinalityBuilder represents the element with cardinality builder

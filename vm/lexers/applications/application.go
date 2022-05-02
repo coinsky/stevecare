@@ -221,7 +221,7 @@ func (app *application) executeToken(
 	if len(channels) > 0 {
 		remainingData, err := app.executeChannels(previousToken, currentToken, channels, previousData, currentData, path, prevTokenData)
 		if err != nil {
-			return nil, nil, nil, prevTokenData, err
+			return nil, nil, nil, nil, err
 		}
 
 		currentData = remainingData
