@@ -307,3 +307,76 @@ func TestElementAdapter_withReference_isInvalidBit_isError(t *testing.T) {
 		return
 	}
 }
+
+func TestElementAdapter_withToken_withTokenAdaptedAdded_isSuccess(t *testing.T) {
+	data := []byte{
+		TokenPrefix,
+	}
+
+	indexValue := uint8(8)
+	indexData := []byte{
+		byte(8),
+		indexValue,
+	}
+
+	linesData, expectedRemaining := NewLinesDataForTests(10, true)
+
+	data = append(data, indexData...)
+	data = append(data, linesData...)
+
+	tokenAdapter := NewTokenAdapter()
+	element, remaining, err := NewElementAdapter().AddTokenAdapter(tokenAdapter).ToElement(data)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if element.IsReference() {
+		t.Errorf("the element was expected to NOT be a reference")
+		return
+	}
+
+	if !element.IsToken() {
+		t.Errorf("the element was expected to be a token")
+		return
+	}
+
+	retIndex := element.Token().Index()
+	if uint(indexValue) != retIndex {
+		t.Errorf("the token index was expected to be %d,%d returned", uint(indexValue), retIndex)
+		return
+	}
+
+	if element.IsByte() {
+		t.Errorf("the element was expected to NOT be a byte")
+		return
+	}
+
+	if !reflect.DeepEqual(remaining, expectedRemaining) {
+		t.Errorf("the expected remaining data was expected to be: %v, %v, returned", expectedRemaining, remaining)
+		return
+	}
+}
+
+func TestElementAdapter_withToken_withoutTokenAdaptedAdded_isSuccess(t *testing.T) {
+	data := []byte{
+		TokenPrefix,
+	}
+
+	indexValue := uint8(8)
+	indexData := []byte{
+		byte(8),
+		indexValue,
+	}
+
+	linesData, _ := NewLinesDataForTests(10, true)
+
+	data = append(data, indexData...)
+	data = append(data, linesData...)
+
+	_, _, err := NewElementAdapter().ToElement(data)
+	if err == nil {
+		t.Errorf("the error was expected to be valid, nil returned")
+		return
+	}
+}

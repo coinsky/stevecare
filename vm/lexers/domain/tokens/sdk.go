@@ -70,8 +70,8 @@ func NewElementWithCardinalityBuilder() ElementWithCardinalityBuilder {
 
 // NewElementAdapter creates a new element adapter
 func NewElementAdapter() ElementAdapter {
-	elementBuilder := NewElementBuilder()
-	return createElementAdapter(elementBuilder)
+	builder := NewElementBuilder()
+	return createElementAdapter(builder)
 }
 
 // NewElementBuilder creates a new element builder
@@ -165,6 +165,7 @@ type ElementWithCardinality interface {
 
 // ElementAdapter represents an element adapter
 type ElementAdapter interface {
+	AddTokenAdapter(tokenAdapter TokenAdapter) ElementAdapter
 	ToElement(data []byte) (Element, []byte, error)
 }
 

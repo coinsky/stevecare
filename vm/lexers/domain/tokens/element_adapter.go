@@ -6,17 +6,24 @@ import (
 )
 
 type elementAdapter struct {
-	elementBuilder ElementBuilder
+	builder      ElementBuilder
+	tokenAdapter TokenAdapter
 }
 
 func createElementAdapter(
-	elementBuilder ElementBuilder,
+	builder ElementBuilder,
 ) ElementAdapter {
 	out := elementAdapter{
-		elementBuilder: elementBuilder,
+		builder: builder,
 	}
 
 	return &out
+}
+
+// AddTokenAdapter adds a token adapter to the builder
+func (app *elementAdapter) AddTokenAdapter(tokenAdapter TokenAdapter) ElementAdapter {
+	app.tokenAdapter = tokenAdapter
+	return app
 }
 
 // ToElement converts data to an element
@@ -26,7 +33,21 @@ func (app *elementAdapter) ToElement(data []byte) (Element, []byte, error) {
 	}
 
 	if data[0] == TokenPrefix {
+		if app.tokenAdapter == nil {
+			return nil, nil, errors.New("the TokenAdapter must be added to the ElementAdapter in order to convert data to a Token instance")
+		}
 
+		token, remaining, err := app.tokenAdapter.ToToken(data)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		ins, err := app.builder.Create().WithToken(token).Now()
+		if err != nil {
+			return nil, nil, err
+		}
+
+		return ins, remaining, nil
 	}
 
 	if data[0] == ReferencePrefix {
@@ -35,7 +56,7 @@ func (app *elementAdapter) ToElement(data []byte) (Element, []byte, error) {
 			return nil, nil, err
 		}
 
-		builder := app.elementBuilder.Create()
+		builder := app.builder.Create()
 		if pHeight != nil {
 			builder.WithReference(uint(*pHeight))
 		}
@@ -61,7 +82,7 @@ func (app *elementAdapter) ToElement(data []byte) (Element, []byte, error) {
 	}
 
 	if data[0] == BytePrefix {
-		ins, err := app.elementBuilder.Create().WithByte(data[1]).Now()
+		ins, err := app.builder.Create().WithByte(data[1]).Now()
 		if err != nil {
 			return nil, nil, err
 		}
