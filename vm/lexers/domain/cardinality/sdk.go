@@ -30,7 +30,7 @@ func NewRangeBuilder() RangeBuilder {
 
 // Adapter represents a cardinality adapter
 type Adapter interface {
-	ToCardinality(data []byte) (Cardinality, error)
+	ToCardinality(data []byte) (Cardinality, []byte, error)
 }
 
 // Builder represents the cardinality builder
