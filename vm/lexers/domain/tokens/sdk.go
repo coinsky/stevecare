@@ -26,6 +26,13 @@ func NewLinesBuilder() LinesBuilder {
 	return createLinesBuilder()
 }
 
+// NewLineAdapter creates a new line adapter
+func NewLineAdapter() LineAdapter {
+	builder := NewLineBuilder()
+	elementAdapter := NewElementWithCardinalityAdapter()
+	return createLineAdapter(builder, elementAdapter)
+}
+
 // NewLineBuilder creates a new line builder
 func NewLineBuilder() LineBuilder {
 	return createLineBuilder()
@@ -96,6 +103,11 @@ type LinesBuilder interface {
 // Lines represents lines
 type Lines interface {
 	List() []Line
+}
+
+// LineAdapter represents the line adapter
+type LineAdapter interface {
+	ToLine(data []byte) (Line, []byte, error)
 }
 
 // LineBuilder represents the line builder
