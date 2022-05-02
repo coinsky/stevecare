@@ -48,6 +48,73 @@ func TestElementAdapter_withByte_isSuccess(t *testing.T) {
 	}
 }
 
+func TestElementAdapter_withReference_withoutAdditionalData_isSuccess(t *testing.T) {
+	elementData := []byte{
+		ReferencePrefix,
+	}
+
+	_, _, err := NewElementAdapter().ToElement(elementData)
+	if err == nil {
+		t.Errorf("the error was expected to be valid, nil returned")
+		return
+	}
+}
+
+func TestElementAdapter_withReference_withHeightBitSize_withoutAdditionalData_isSuccess(t *testing.T) {
+	elementData := []byte{
+		ReferencePrefix,
+		uint8(8),
+	}
+
+	_, _, err := NewElementAdapter().ToElement(elementData)
+	if err == nil {
+		t.Errorf("the error was expected to be valid, nil returned")
+		return
+	}
+}
+
+func TestElementAdapter_withReference_withSixteenBitSize_withoutEnoughAdditionalData_isSuccess(t *testing.T) {
+	elementData := []byte{
+		ReferencePrefix,
+		uint8(16),
+		byte(2),
+	}
+
+	_, _, err := NewElementAdapter().ToElement(elementData)
+	if err == nil {
+		t.Errorf("the error was expected to be valid, nil returned")
+		return
+	}
+}
+
+func TestElementAdapter_withReference_withThirtyTwoBitSize_withoutEnoughAdditionalData_isSuccess(t *testing.T) {
+	elementData := []byte{
+		ReferencePrefix,
+		uint8(32),
+		byte(2),
+	}
+
+	_, _, err := NewElementAdapter().ToElement(elementData)
+	if err == nil {
+		t.Errorf("the error was expected to be valid, nil returned")
+		return
+	}
+}
+
+func TestElementAdapter_withReference_withSixtyFourBitSize_withoutEnoughAdditionalData_isSuccess(t *testing.T) {
+	elementData := []byte{
+		ReferencePrefix,
+		uint8(64),
+		byte(2),
+	}
+
+	_, _, err := NewElementAdapter().ToElement(elementData)
+	if err == nil {
+		t.Errorf("the error was expected to be valid, nil returned")
+		return
+	}
+}
+
 func TestElementAdapter_withReference_isHeightBit_isSuccess(t *testing.T) {
 	expectedRemaining := []byte{0, 3, 4, 5}
 	refValue := uint8(8)

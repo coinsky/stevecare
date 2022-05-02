@@ -1,7 +1,6 @@
 package tokens
 
 import (
-	"encoding/binary"
 	"errors"
 	"fmt"
 )
@@ -31,32 +30,26 @@ func (app *elementAdapter) ToElement(data []byte) (Element, []byte, error) {
 	}
 
 	if data[0] == ReferencePrefix {
-		data = data[1:]
-		remaining := []byte{}
+		pHeight, pSixteen, pThirtyTwo, pSixtyFour, remaining, err := parseUintData(data[1:])
+		if err != nil {
+			return nil, nil, err
+		}
+
 		builder := app.elementBuilder.Create()
-		switch data[0] {
-		case 8:
-			builder.WithReference(uint(data[1]))
-			remaining = data[2:]
-			break
-		case 16:
-			value := binary.BigEndian.Uint16(data[1:9])
-			builder.WithReference(uint(value))
-			remaining = data[9:]
-			break
-		case 32:
-			value := binary.BigEndian.Uint32(data[1:9])
-			builder.WithReference(uint(value))
-			remaining = data[9:]
-			break
-		case 64:
-			value := binary.BigEndian.Uint64(data[1:9])
-			builder.WithReference(uint(value))
-			remaining = data[9:]
-			break
-		default:
-			str := fmt.Sprintf("the referenced element was expected to contain one of these: [8, 16, 32, 64] in its data at index %d, %d provided", 1, data[1])
-			return nil, nil, errors.New(str)
+		if pHeight != nil {
+			builder.WithReference(uint(*pHeight))
+		}
+
+		if pSixteen != nil {
+			builder.WithReference(uint(*pSixteen))
+		}
+
+		if pThirtyTwo != nil {
+			builder.WithReference(uint(*pThirtyTwo))
+		}
+
+		if pSixtyFour != nil {
+			builder.WithReference(uint(*pSixtyFour))
 		}
 
 		ins, err := builder.Now()

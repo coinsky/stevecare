@@ -19,6 +19,13 @@ func NewBuilder() Builder {
 	return createBuilder()
 }
 
+// NewTokenAdapter creates a new token adapter
+func NewTokenAdapter() TokenAdapter {
+	builder := NewTokenBuilder()
+	linesAdapter := NewLinesAdapter()
+	return createTokenAdapter(builder, linesAdapter)
+}
+
 // NewTokenBuilder creates a new token builder instance
 func NewTokenBuilder() TokenBuilder {
 	return createTokenBuilder()
