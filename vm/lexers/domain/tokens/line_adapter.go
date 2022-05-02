@@ -1,5 +1,10 @@
 package tokens
 
+import (
+	"errors"
+	"fmt"
+)
+
 type lineAdapter struct {
 	builder        LineBuilder
 	elementAdapter ElementWithCardinalityAdapter
@@ -19,7 +24,16 @@ func createLineAdapter(
 
 // ToLine converts data to a line instance
 func (app *lineAdapter) ToLine(data []byte) (Line, []byte, error) {
-	remaining := data
+	if len(data) <= 0 {
+		return nil, nil, errors.New("the data must contain at least 1 element in order be converted to a Line instance")
+	}
+
+	if data[0] != LinePrefix {
+		str := fmt.Sprintf("the line prefix was expected to be %d, %d provided", LinePrefix, data[0])
+		return nil, nil, errors.New(str)
+	}
+
+	remaining := data[1:]
 	list := []ElementWithCardinality{}
 	for {
 		if len(remaining) <= 0 {

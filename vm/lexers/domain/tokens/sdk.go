@@ -2,6 +2,9 @@ package tokens
 
 import "github.com/steve-care-software/stevecare/vm/lexers/domain/cardinality"
 
+// LinePrefix represents the line prefix
+const LinePrefix = 0
+
 // BytePrefix represents the byte prefix (ascii of '%')
 const BytePrefix = 37
 
@@ -19,6 +22,13 @@ func NewBuilder() Builder {
 // NewTokenBuilder creates a new token builder instance
 func NewTokenBuilder() TokenBuilder {
 	return createTokenBuilder()
+}
+
+// NewLinesAdapter creates a new lines adapter
+func NewLinesAdapter() LinesAdapter {
+	builder := NewLinesBuilder()
+	lineAdapter := NewLineAdapter()
+	return createLinesAdapter(builder, lineAdapter)
 }
 
 // NewLinesBuilder creates a new lines builder
@@ -91,6 +101,11 @@ type TokenBuilder interface {
 type Token interface {
 	Index() uint
 	Lines() Lines
+}
+
+// LinesAdapter represents the lines adapter
+type LinesAdapter interface {
+	ToLines(data []byte) (Lines, []byte, error)
 }
 
 // LinesBuilder represents the lines builder

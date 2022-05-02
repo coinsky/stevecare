@@ -8,6 +8,41 @@ import (
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/cardinality"
 )
 
+// NewLinesDataForTests returns the line's data for tests
+func NewLinesDataForTests(amountOfLines uint, withRemaining bool) ([]byte, []byte) {
+	data := []byte{}
+	lastRemaining := []byte{}
+	for i := 0; i < int(amountOfLines); i++ {
+		s1 := rand.NewSource(time.Now().UnixNano())
+		r1 := rand.New(s1)
+		amountOfElements := r1.Intn(15) + 1
+
+		hasRemaining := (i+1 >= int(amountOfLines)) && withRemaining
+		elementData, remainingData := NewLineDataForTests(uint(amountOfElements), hasRemaining)
+		lastRemaining = remainingData
+		data = append(data, elementData...)
+	}
+
+	return data, lastRemaining
+}
+
+// NewLineDataForTests returns the line data for tests
+func NewLineDataForTests(amountOfElements uint, withRemaining bool) ([]byte, []byte) {
+	data := []byte{
+		LinePrefix,
+	}
+
+	lastRemaining := []byte{}
+	for i := 0; i < int(amountOfElements); i++ {
+		hasRemaining := (i+1 >= int(amountOfElements)) && withRemaining
+		elementData, remainingData := NewElementWithCardinalityDataForTests(hasRemaining)
+		lastRemaining = remainingData
+		data = append(data, elementData...)
+	}
+
+	return data, lastRemaining
+}
+
 // NewElementWithCardinalityDataForTests returns ElementWithCardinality's data for tests
 func NewElementWithCardinalityDataForTests(withRemaining bool) ([]byte, []byte) {
 	s1 := rand.NewSource(time.Now().UnixNano())
