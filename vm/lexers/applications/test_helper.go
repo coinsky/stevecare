@@ -2,13 +2,69 @@ package applications
 
 import (
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/cardinality"
+	"github.com/steve-care-software/stevecare/vm/lexers/domain/channels"
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/grammars"
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 )
 
 // NewGrammarForTests creates a new grammar for tests
 func NewGrammarForTests(root tokens.Token) grammars.Grammar {
-	ins, err := grammars.NewBuilder().Create().WithRoot(root).Now()
+	return NewGrammarWithChannelsForTests(root, nil)
+}
+
+// NewGrammarWithChannelsForTests creates a new grammar with channels for tests
+func NewGrammarWithChannelsForTests(root tokens.Token, list []channels.Channel) grammars.Grammar {
+	grammarBuilder := grammars.NewBuilder().Create().WithRoot(root)
+	if list != nil {
+		chans, err := channels.NewBuilder().WithList(list).Now()
+		if err != nil {
+			panic(err)
+		}
+
+		grammarBuilder.WithChannels(chans)
+	}
+
+	ins, err := grammarBuilder.Now()
+	if err != nil {
+		panic(err)
+	}
+
+	return ins
+}
+
+// NewChannelForTests creates a new channel for tests
+func NewChannelForTests(token tokens.Token) channels.Channel {
+	return NewChannelWithConditionsForTests(token, nil)
+}
+
+// NewChannelWithConditionsForTests creates a new channel woth conditions for tests
+func NewChannelWithConditionsForTests(token tokens.Token, condition channels.Condition) channels.Channel {
+	builder := channels.NewChannelBuilder().Create().WithToken(token)
+	if condition != nil {
+		builder.WithCondition(condition)
+	}
+
+	ins, err := builder.Now()
+	if err != nil {
+		panic(err)
+	}
+
+	return ins
+}
+
+// NewConditionWithNext creates a new condition with next
+func NewConditionWithNext(next tokens.Token) channels.Condition {
+	ins, err := channels.NewConditionBuilder().Create().WithNext(next).Now()
+	if err != nil {
+		panic(err)
+	}
+
+	return ins
+}
+
+// NewConditionWithPrevious creates a new condition with previous
+func NewConditionWithPrevious(previous tokens.Token) channels.Condition {
+	ins, err := channels.NewConditionBuilder().Create().WithPrevious(previous).Now()
 	if err != nil {
 		panic(err)
 	}

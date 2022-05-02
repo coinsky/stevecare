@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/steve-care-software/stevecare/vm/lexers/domain/channels"
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 )
 
@@ -451,14 +452,14 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_wi
 	}
 
 	index := result.Index()
-	if index != 1 {
-		t.Errorf("the cursor was expected to be %d, %d returned", 1, index)
+	if index != 0 {
+		t.Errorf("the index was expected to be %d, %d returned", 0, index)
 		return
 	}
 
 	cursor := result.Cursor()
-	if cursor != 6 {
-		t.Errorf("the cursor was expected to be %d, %d returned", 6, cursor)
+	if cursor != 5 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 5, cursor)
 		return
 	}
 
@@ -527,6 +528,139 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_i
 	cursor := result.Cursor()
 	if cursor != 4 {
 		t.Errorf("the cursor was expected to be %d, %d returned", 4, cursor)
+		return
+	}
+
+	if !result.IsSuccess() {
+		t.Errorf("the result was expected to be successful")
+		return
+	}
+
+	path := result.Path()
+	expectedPath := []uint{0}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
+		return
+	}
+}
+
+func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_withChannel_isSuccess(t *testing.T) {
+	minimum := uint(2)
+	maximum := uint(5)
+	byteVal := []byte("(")
+	data := []byte(" (((( ")
+
+	application := NewApplication()
+	grammar := NewGrammarWithChannelsForTests(
+		NewTokenWithRangeCardinalityWithByteForTests(uint(0), minimum, maximum, byteVal[0]),
+		[]channels.Channel{
+			NewChannelForTests(NewTokenWithMinimumCardinalityWithByteForTests(uint(1), uint(0), []byte(" ")[0])),
+		},
+	)
+
+	result, err := application.Execute(grammar, data, true)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	cursor := result.Cursor()
+	if cursor != 6 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 6, cursor)
+		return
+	}
+
+	if !result.IsSuccess() {
+		t.Errorf("the result was expected to be successful")
+		return
+	}
+
+	path := result.Path()
+	expectedPath := []uint{0}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
+		return
+	}
+}
+
+func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_withChannel_withOpenParenthesisNextElement_isSuccess(t *testing.T) {
+	minimum := uint(2)
+	maximum := uint(5)
+	byteVal := []byte("(")
+	data := []byte(" (((( ")
+
+	application := NewApplication()
+	grammar := NewGrammarWithChannelsForTests(
+		NewTokenWithRangeCardinalityWithByteForTests(uint(0), minimum, maximum, byteVal[0]),
+		[]channels.Channel{
+			NewChannelWithConditionsForTests(
+				NewTokenWithMinimumCardinalityWithByteForTests(uint(1), uint(0), []byte(" ")[0]),
+				NewConditionWithNext(
+					NewTokenWithRangeCardinalityWithByteForTests(uint(2), uint(0), uint(2), []byte("(")[0]),
+				),
+			),
+		},
+	)
+
+	result, err := application.Execute(grammar, data, true)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	cursor := result.Cursor()
+	if cursor != 5 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 5, cursor)
+		return
+	}
+
+	if !result.IsSuccess() {
+		t.Errorf("the result was expected to be successful")
+		return
+	}
+
+	path := result.Path()
+	expectedPath := []uint{0}
+	if !reflect.DeepEqual(expectedPath, path) {
+		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
+		return
+	}
+}
+
+func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_withChannel_withOpenParenthesisPreviousElement_isSuccess(t *testing.T) {
+	minimum := uint(2)
+	maximum := uint(5)
+	byteVal := []byte("(")
+	data := []byte(" (((( ")
+
+	application := NewApplication()
+	grammar := NewGrammarWithChannelsForTests(
+		NewTokenWithRangeCardinalityWithByteForTests(uint(0), minimum, maximum, byteVal[0]),
+		[]channels.Channel{
+			NewChannelWithConditionsForTests(
+				NewTokenWithMinimumCardinalityWithByteForTests(uint(1), uint(0), []byte(" ")[0]),
+				NewConditionWithPrevious(
+					NewTokenWithRangeCardinalityWithByteForTests(uint(2), uint(0), uint(2), []byte("(")[0]),
+				),
+			),
+		},
+	)
+
+	result, err := application.Execute(grammar, data, true)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	index := result.Index()
+	if index != 1 {
+		t.Errorf("the index was expected to be %d, %d returned", 1, index)
+		return
+	}
+
+	cursor := result.Cursor()
+	if cursor != 5 {
+		t.Errorf("the cursor was expected to be %d, %d returned", 5, cursor)
 		return
 	}
 
