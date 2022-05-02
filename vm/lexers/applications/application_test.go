@@ -8,31 +8,44 @@ import (
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 )
 
+/*
+func TestCompile_oneToken_isSuccess(t *testing.T) {
+	script := `
+		%rootToken;
+		0@rootToken: $37[23,32] rootToken? subToken?;
+		1@subToken: $37;
+	`
+	application := NewApplication()
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	fmt.Printf("\n%s\n", grammar)
+}*/
+
 func TestLexer_withReference_withSuccessIndex_isSuccess(t *testing.T) {
-	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint8(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
-	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint8(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
-	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint8(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
-	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint8(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
+	script := `
+		%rootToken;
+		4@rootToken : .openParenthesis .rootToken .closeParenthesis
+					| .five .minus .five
+					;
 
-	conditionFirstLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
-		openTokenElWithCard,
-		NewElementWithCardinalityWithReferenceAndCardinalityForTests(uint(4), uint(5), NewCardinalityWithSpecificForTests(1)),
-		closeTokenElWithCard,
-	})
+		0@openParenthesis: $40;
+		1@closeParenthesis: $41;
+		2@five: $53;
+		3@minus: $60;
+	`
 
-	conditionSecondLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
-		fiveTokenElWithCard,
-		smallerThanTokenElWithCard,
-		fiveTokenElWithCard,
-	})
-
-	grammar := NewGrammarForTests(NewTokenWithLinesForTests(uint(5), []tokens.Line{
-		conditionFirstLine,
-		conditionSecondLine,
-	}))
+	application := NewApplication()
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
 
 	data := []byte("((5<5))567")
-	application := NewApplication()
 	result, err := application.Execute(grammar, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -51,7 +64,7 @@ func TestLexer_withReference_withSuccessIndex_isSuccess(t *testing.T) {
 	}
 
 	path := result.Path()
-	expectedPath := []uint{5, 0, 5, 0, 5, 2, 3, 2, 1, 1}
+	expectedPath := []uint{4, 0, 4, 0, 4, 2, 3, 2, 1, 1}
 	if !reflect.DeepEqual(expectedPath, path) {
 		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
@@ -59,30 +72,26 @@ func TestLexer_withReference_withSuccessIndex_isSuccess(t *testing.T) {
 }
 
 func TestLexer_withReference_withSuccessIndex_notEnoughData_cannotHavePrefix_isNotSuccess(t *testing.T) {
-	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint8(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
-	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint8(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
-	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint8(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
-	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint8(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
+	script := `
+		%rootToken;
+		4@rootToken : .openParenthesis .rootToken .closeParenthesis
+					| .five .minus .five
+					;
 
-	conditionFirstLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
-		openTokenElWithCard,
-		NewElementWithCardinalityWithReferenceAndCardinalityForTests(uint(4), uint(5), NewCardinalityWithSpecificForTests(1)),
-		closeTokenElWithCard,
-	})
+		0@openParenthesis: $40;
+		1@closeParenthesis: $41;
+		2@five: $53;
+		3@minus: $60;
+	`
 
-	conditionSecondLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
-		fiveTokenElWithCard,
-		smallerThanTokenElWithCard,
-		fiveTokenElWithCard,
-	})
-
-	grammar := NewGrammarForTests(NewTokenWithLinesForTests(uint(5), []tokens.Line{
-		conditionFirstLine,
-		conditionSecondLine,
-	}))
+	application := NewApplication()
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
 
 	data := []byte("((5<5)")
-	application := NewApplication()
 	result, err := application.Execute(grammar, data, false)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -107,7 +116,7 @@ func TestLexer_withReference_withSuccessIndex_notEnoughData_cannotHavePrefix_isN
 	}
 
 	path := result.Path()
-	expectedPath := []uint{5}
+	expectedPath := []uint{4}
 	if !reflect.DeepEqual(expectedPath, path) {
 		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
@@ -115,30 +124,26 @@ func TestLexer_withReference_withSuccessIndex_notEnoughData_cannotHavePrefix_isN
 }
 
 func TestLexer_withReference_withSuccessIndex_notEnoughData_withPrefix_isSuccess(t *testing.T) {
-	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint8(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
-	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint8(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
-	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint8(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
-	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint8(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
+	script := `
+		%rootToken;
+		4@rootToken : .openParenthesis .rootToken .closeParenthesis
+					| .five .minus .five
+					;
 
-	conditionFirstLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
-		openTokenElWithCard,
-		NewElementWithCardinalityWithReferenceAndCardinalityForTests(uint(4), uint(5), NewCardinalityWithSpecificForTests(1)),
-		closeTokenElWithCard,
-	})
+		0@openParenthesis: $40;
+		1@closeParenthesis: $41;
+		2@five: $53;
+		3@minus: $60;
+	`
 
-	conditionSecondLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
-		fiveTokenElWithCard,
-		smallerThanTokenElWithCard,
-		fiveTokenElWithCard,
-	})
-
-	grammar := NewGrammarForTests(NewTokenWithLinesForTests(uint(5), []tokens.Line{
-		conditionFirstLine,
-		conditionSecondLine,
-	}))
+	application := NewApplication()
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
 
 	data := []byte("((5<5)")
-	application := NewApplication()
 	result, err := application.Execute(grammar, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -163,7 +168,7 @@ func TestLexer_withReference_withSuccessIndex_notEnoughData_withPrefix_isSuccess
 	}
 
 	path := result.Path()
-	expectedPath := []uint{5, 0, 5, 2, 3, 2, 1}
+	expectedPath := []uint{4, 0, 4, 2, 3, 2, 1}
 	if !reflect.DeepEqual(expectedPath, path) {
 		t.Errorf("the path was expected to be %v, %v returned", expectedPath, path)
 		return
@@ -171,16 +176,19 @@ func TestLexer_withReference_withSuccessIndex_notEnoughData_withPrefix_isSuccess
 }
 
 func TestLexer_withReference_isInfiniteRecursive_isNotSuccess(t *testing.T) {
-	conditionFirstLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
-		NewElementWithCardinalityWithReferenceAndCardinalityForTests(uint(4), uint(5), NewCardinalityWithSpecificForTests(1)),
-	})
+	script := `
+		%rootToken;
+		5@rootToken : .rootToken;
+	`
 
-	grammar := NewGrammarForTests(NewTokenWithLinesForTests(uint(5), []tokens.Line{
-		conditionFirstLine,
-	}))
+	application := NewApplication()
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
 
 	data := []byte("((5<5))")
-	application := NewApplication()
 	result, err := application.Execute(grammar, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -206,6 +214,7 @@ func TestLexer_withReference_isInfiniteRecursive_isNotSuccess(t *testing.T) {
 	}
 }
 
+// we don't use the script here because its impossible to convert a script to a grammar with an undeclared reference
 func TestLexer_withUndeclaredReference_withPrefix_isSuccess(t *testing.T) {
 	invalidReferenceIndex := uint(20)
 	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint8(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
@@ -264,21 +273,22 @@ func TestLexer_withUndeclaredReference_withPrefix_isSuccess(t *testing.T) {
 }
 
 func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_withSuccessIndex_isSuccess(t *testing.T) {
-	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint8(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
-	hyphenTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint8(1), []byte("-")[0]), NewCardinalityWithSpecificForTests(1))
-	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint8(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
-	tokenLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
-		openTokenElWithCard,
-		hyphenTokenElWithCard,
-		closeTokenElWithCard,
-	})
+	script := `
+		%rootToken;
+		3@rootToken : .openParenthesis .hyphen .closeParenthesis;
+		0@openParenthesis: $40;
+		1@hyphen: $45;
+		2@closeParenthesis: $41;
+	`
 
-	grammar := NewGrammarForTests(NewTokenWithLinesForTests(uint(3), []tokens.Line{
-		tokenLine,
-	}))
+	application := NewApplication()
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
 
 	data := []byte("(-)345")
-	application := NewApplication()
 	result, err := application.Execute(grammar, data, true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -306,13 +316,19 @@ func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_withSuccessInde
 }
 
 func TestLexer_withOneLine_withSpecificCardinality_withByte_withoutSuccessIndex_isSuccess(t *testing.T) {
-	tokenIndex := uint(0)
-	specific := uint8(1)
-	byteVal := []byte("(")
+	script := `
+		%openParenthesis;
+		0@openParenthesis : $40;
+	`
 
 	application := NewApplication()
-	grammar := NewGrammarForTests(NewTokenWithSpecificCardinalityWithByteForTests(tokenIndex, specific, byteVal[0]))
-	result, err := application.Execute(grammar, byteVal, true)
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := application.Execute(grammar, []byte("("), true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -338,14 +354,20 @@ func TestLexer_withOneLine_withSpecificCardinality_withByte_withoutSuccessIndex_
 }
 
 func TestLexer_withOneLine_withMinimumCardinality_withByte_withExactlyMinOccurences_isSuccess(t *testing.T) {
-	tokenIndex := uint(0)
-	minimum := uint8(2)
-	byteVal := []byte("(")
-	data := []byte("((")
+
+	script := `
+		%openParenthesis;
+		0@openParenthesis : $40[2,];
+	`
 
 	application := NewApplication()
-	grammar := NewGrammarForTests(NewTokenWithMinimumCardinalityWithByteForTests(tokenIndex, minimum, byteVal[0]))
-	result, err := application.Execute(grammar, data, true)
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := application.Execute(grammar, []byte("(("), true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -371,14 +393,19 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withExactlyMinOccuren
 }
 
 func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccurences_isSuccess(t *testing.T) {
-	tokenIndex := uint(0)
-	minimum := uint8(2)
-	byteVal := []byte("(")
-	data := []byte("(((")
+	script := `
+		%openParenthesis;
+		0@openParenthesis : $40[2,];
+	`
 
 	application := NewApplication()
-	grammar := NewGrammarForTests(NewTokenWithMinimumCardinalityWithByteForTests(tokenIndex, minimum, byteVal[0]))
-	result, err := application.Execute(grammar, data, true)
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := application.Execute(grammar, []byte("((("), true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -404,14 +431,19 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccure
 }
 
 func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_isNotSuccess(t *testing.T) {
-	tokenIndex := uint(0)
-	minimum := uint8(2)
-	byteVal := []byte("(")
-	data := []byte("(")
+	script := `
+		%openParenthesis;
+		0@openParenthesis : $40[2,];
+	`
 
 	application := NewApplication()
-	grammar := NewGrammarForTests(NewTokenWithMinimumCardinalityWithByteForTests(tokenIndex, minimum, byteVal[0]))
-	result, err := application.Execute(grammar, data, true)
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := application.Execute(grammar, []byte("("), true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -437,15 +469,19 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_i
 }
 
 func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_withPrefix_isSuccess(t *testing.T) {
-	tokenIndex := uint(0)
-	minimum := uint8(2)
-	maximum := uint8(5)
-	byteVal := []byte("(")
-	data := []byte("((((((")
+	script := `
+		%openParenthesis;
+		0@openParenthesis : $40[2,5];
+	`
 
 	application := NewApplication()
-	grammar := NewGrammarForTests(NewTokenWithRangeCardinalityWithByteForTests(tokenIndex, minimum, maximum, byteVal[0]))
-	result, err := application.Execute(grammar, data, true)
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := application.Execute(grammar, []byte("(((((("), true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -477,15 +513,19 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_wi
 }
 
 func TestLexer_withOneLine_withRangeCardinality_withByte_withExactlyMaximumOccurences_isSuccess(t *testing.T) {
-	tokenIndex := uint(0)
-	minimum := uint8(2)
-	maximum := uint8(5)
-	byteVal := []byte("(")
-	data := []byte("(((((")
+	script := `
+		%openParenthesis;
+		0@openParenthesis : $40[2,5];
+	`
 
 	application := NewApplication()
-	grammar := NewGrammarForTests(NewTokenWithRangeCardinalityWithByteForTests(tokenIndex, minimum, maximum, byteVal[0]))
-	result, err := application.Execute(grammar, data, true)
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := application.Execute(grammar, []byte("((((("), true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -511,15 +551,19 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withExactlyMaximumOccur
 }
 
 func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_isSuccess(t *testing.T) {
-	tokenIndex := uint(0)
-	minimum := uint8(2)
-	maximum := uint8(5)
-	byteVal := []byte("(")
-	data := []byte("((((")
+	script := `
+		%openParenthesis;
+		0@openParenthesis : $40[2,5];
+	`
 
 	application := NewApplication()
-	grammar := NewGrammarForTests(NewTokenWithRangeCardinalityWithByteForTests(tokenIndex, minimum, maximum, byteVal[0]))
-	result, err := application.Execute(grammar, data, true)
+	grammar, err := application.Compile(script)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	result, err := application.Execute(grammar, []byte("(((("), true)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return

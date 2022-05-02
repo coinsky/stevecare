@@ -9,7 +9,6 @@ import (
 func parseUintData(data []byte) (*uint8, *uint16, *uint32, *uint64, []byte, error) {
 	switch data[0] {
 	case 8:
-
 		if len(data) <= 1 {
 			return nil, nil, nil, nil, nil, errors.New("the data was expected to contain at least 1 byte in order to convert it to a uint8")
 		}
