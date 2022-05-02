@@ -8,23 +8,6 @@ import (
 	"github.com/steve-care-software/stevecare/vm/lexers/domain/tokens"
 )
 
-/*
-func TestCompile_oneToken_isSuccess(t *testing.T) {
-	script := `
-		%rootToken;
-		0@rootToken: $37[23,32] rootToken? subToken?;
-		1@subToken: $37;
-	`
-	application := NewApplication()
-	grammar, err := application.Compile(script)
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	fmt.Printf("\n%s\n", grammar)
-}*/
-
 func TestLexer_withReference_withSuccessIndex_isSuccess(t *testing.T) {
 	script := `
 		%rootToken;
