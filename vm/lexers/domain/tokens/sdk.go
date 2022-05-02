@@ -2,6 +2,12 @@ package tokens
 
 import "github.com/steve-care-software/stevecare/vm/lexers/domain/cardinality"
 
+// TokenPrefix represents the token prefix (ascii of '$')
+const TokenPrefix = 36
+
+// ReferencePrefix represents the token prefix (ascii of '@')
+const ReferencePrefix = 64
+
 // NewBuilder creates a new tokens builder instance
 func NewBuilder() Builder {
 	return createBuilder()
@@ -27,6 +33,12 @@ func NewElementWithCardinalityBuilder() ElementWithCardinalityBuilder {
 	return createElementWithCardinalityBuilder()
 }
 
+// NewElementAdapter creates a new element adapter
+func NewElementAdapter() ElementAdapter {
+	elementBuilder := NewElementBuilder()
+	return createElementAdapter(elementBuilder)
+}
+
 // NewElementBuilder creates a new element builder
 func NewElementBuilder() ElementBuilder {
 	return createElementBuilder()
@@ -42,6 +54,11 @@ type Builder interface {
 // Tokens represents a list of token
 type Tokens interface {
 	List() []Token
+}
+
+// TokenAdapter represents a token adapter
+type TokenAdapter interface {
+	ToToken(data []byte) (Token, []byte, error)
 }
 
 // TokenBuilder represents the token builder
@@ -94,6 +111,11 @@ type ElementWithCardinalityBuilder interface {
 type ElementWithCardinality interface {
 	Element() Element
 	Cardinality() cardinality.Cardinality
+}
+
+// ElementAdapter represents an element adapter
+type ElementAdapter interface {
+	ToElement(data []byte) (Element, []byte, error)
 }
 
 // ElementBuilder represents the element builder
