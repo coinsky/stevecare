@@ -2,7 +2,7 @@ package cardinality
 
 type cardinality struct {
 	rnge      Range
-	pSpecific *uint
+	pSpecific *uint8
 }
 
 func createCardinalityWithRange(
@@ -12,14 +12,14 @@ func createCardinalityWithRange(
 }
 
 func createCardinalityWithSpecific(
-	pSpecific *uint,
+	pSpecific *uint8,
 ) Cardinality {
 	return createCardinalityInternally(nil, pSpecific)
 }
 
 func createCardinalityInternally(
 	rnge Range,
-	pSpecific *uint,
+	pSpecific *uint8,
 ) Cardinality {
 	out := cardinality{
 		rnge:      rnge,
@@ -27,6 +27,19 @@ func createCardinalityInternally(
 	}
 
 	return &out
+}
+
+// Bytes returns the []byte representation of the cardinality
+func (obj *cardinality) Bytes() []byte {
+	if obj.IsRange() {
+		return obj.Range().Bytes()
+	}
+
+	return []byte{
+		Open,
+		byte(*obj.pSpecific),
+		Close,
+	}
 }
 
 // IsRange returns true if there is a range, false otherwise
@@ -45,6 +58,6 @@ func (obj *cardinality) IsSpecific() bool {
 }
 
 // Specific returns the specific value, if any
-func (obj *cardinality) Specific() *uint {
+func (obj *cardinality) Specific() *uint8 {
 	return obj.pSpecific
 }

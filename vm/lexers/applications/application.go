@@ -335,7 +335,7 @@ func (app *application) executeElementWithCardinality(
 
 	cpt := uint(0)
 	rnge := cardinality.Range()
-	min := rnge.Min()
+	min := uint(rnge.Min())
 	for {
 
 		if len(remainingData) <= 0 {
@@ -344,7 +344,7 @@ func (app *application) executeElementWithCardinality(
 
 		if rnge.HasMax() {
 			pMax := rnge.Max()
-			if cpt >= *pMax {
+			if cpt >= uint(*pMax) {
 				break
 			}
 		}

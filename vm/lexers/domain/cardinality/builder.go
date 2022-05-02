@@ -4,7 +4,7 @@ import "errors"
 
 type builder struct {
 	rnge      Range
-	pSpecific *uint
+	pSpecific *uint8
 }
 
 func createBuilder() Builder {
@@ -28,7 +28,7 @@ func (app *builder) WithRange(rnge Range) Builder {
 }
 
 // WithSpecific adds a specific value to the builder
-func (app *builder) WithSpecific(specific uint) Builder {
+func (app *builder) WithSpecific(specific uint8) Builder {
 	app.pSpecific = &specific
 	return app
 }

@@ -73,7 +73,7 @@ func NewConditionWithPrevious(previous tokens.Token) channels.Condition {
 }
 
 // NewCardinalityWithSpecificForTests creates cardinality with specific for tests
-func NewCardinalityWithSpecificForTests(specific uint) cardinality.Cardinality {
+func NewCardinalityWithSpecificForTests(specific uint8) cardinality.Cardinality {
 	cardinality, err := cardinality.NewBuilder().Create().WithSpecific(specific).Now()
 	if err != nil {
 		panic(err)
@@ -103,7 +103,7 @@ func NewElementWithCardinalityWithReferenceAndCardinalityForTests(tokenIndex uin
 }
 
 // NewTokenWithRangeCardinalityWithByteForTests creates a new token with range cardinality with byte for tests
-func NewTokenWithRangeCardinalityWithByteForTests(tokenIndex uint, min uint, max uint, byteVal byte) tokens.Token {
+func NewTokenWithRangeCardinalityWithByteForTests(tokenIndex uint, min uint8, max uint8, byteVal byte) tokens.Token {
 	element, err := tokens.NewElementBuilder().Create().WithByte(byteVal).Now()
 	if err != nil {
 		panic(err)
@@ -123,7 +123,7 @@ func NewTokenWithRangeCardinalityWithByteForTests(tokenIndex uint, min uint, max
 }
 
 // NewTokenWithMinimumCardinalityWithByteForTests creates a new token with min cardinality with byte for tests
-func NewTokenWithMinimumCardinalityWithByteForTests(tokenIndex uint, min uint, byteVal byte) tokens.Token {
+func NewTokenWithMinimumCardinalityWithByteForTests(tokenIndex uint, min uint8, byteVal byte) tokens.Token {
 	element, err := tokens.NewElementBuilder().Create().WithByte(byteVal).Now()
 	if err != nil {
 		panic(err)
@@ -143,7 +143,7 @@ func NewTokenWithMinimumCardinalityWithByteForTests(tokenIndex uint, min uint, b
 }
 
 // NewTokenWithSpecificCardinalityWithByteForTests creates a new token with specific cardinality with byte for tests
-func NewTokenWithSpecificCardinalityWithByteForTests(tokenIndex uint, specific uint, byteVal byte) tokens.Token {
+func NewTokenWithSpecificCardinalityWithByteForTests(tokenIndex uint, specific uint8, byteVal byte) tokens.Token {
 	element, err := tokens.NewElementBuilder().Create().WithByte(byteVal).Now()
 	if err != nil {
 		panic(err)

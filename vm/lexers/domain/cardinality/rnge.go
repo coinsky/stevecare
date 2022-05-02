@@ -1,26 +1,26 @@
 package cardinality
 
 type rnge struct {
-	min  uint
-	pMax *uint
+	min  uint8
+	pMax *uint8
 }
 
 func createRange(
-	min uint,
+	min uint8,
 ) Range {
 	return createRangeInternally(min, nil)
 }
 
 func createRangeWithMaximum(
-	min uint,
-	pMax *uint,
+	min uint8,
+	pMax *uint8,
 ) Range {
 	return createRangeInternally(min, pMax)
 }
 
 func createRangeInternally(
-	min uint,
-	pMax *uint,
+	min uint8,
+	pMax *uint8,
 ) Range {
 	out := rnge{
 		min:  min,
@@ -30,8 +30,28 @@ func createRangeInternally(
 	return &out
 }
 
+// Bytes returns the []byte representation of the range
+func (obj *rnge) Bytes() []byte {
+	if obj.HasMax() {
+		return []byte{
+			Open,
+			byte(obj.Min()),
+			Separator,
+			byte(*obj.pMax),
+			Close,
+		}
+	}
+
+	return []byte{
+		Open,
+		byte(obj.Min()),
+		Separator,
+		Close,
+	}
+}
+
 // Min returns the minimum
-func (obj *rnge) Min() uint {
+func (obj *rnge) Min() uint8 {
 	return obj.min
 }
 
@@ -41,6 +61,6 @@ func (obj *rnge) HasMax() bool {
 }
 
 // Max returns the maximum, if any
-func (obj *rnge) Max() *uint {
+func (obj *rnge) Max() *uint8 {
 	return obj.pMax
 }

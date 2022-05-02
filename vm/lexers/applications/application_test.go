@@ -9,10 +9,10 @@ import (
 )
 
 func TestLexer_withReference_withSuccessIndex_isSuccess(t *testing.T) {
-	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
-	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
-	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
-	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
+	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint8(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
+	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint8(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
+	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint8(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
+	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint8(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
 
 	conditionFirstLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
 		openTokenElWithCard,
@@ -59,10 +59,10 @@ func TestLexer_withReference_withSuccessIndex_isSuccess(t *testing.T) {
 }
 
 func TestLexer_withReference_withSuccessIndex_notEnoughData_cannotHavePrefix_isNotSuccess(t *testing.T) {
-	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
-	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
-	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
-	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
+	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint8(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
+	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint8(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
+	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint8(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
+	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint8(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
 
 	conditionFirstLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
 		openTokenElWithCard,
@@ -115,10 +115,10 @@ func TestLexer_withReference_withSuccessIndex_notEnoughData_cannotHavePrefix_isN
 }
 
 func TestLexer_withReference_withSuccessIndex_notEnoughData_withPrefix_isSuccess(t *testing.T) {
-	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
-	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
-	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
-	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
+	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint8(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
+	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint8(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
+	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint8(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
+	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint8(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
 
 	conditionFirstLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
 		openTokenElWithCard,
@@ -208,10 +208,10 @@ func TestLexer_withReference_isInfiniteRecursive_isNotSuccess(t *testing.T) {
 
 func TestLexer_withUndeclaredReference_withPrefix_isSuccess(t *testing.T) {
 	invalidReferenceIndex := uint(20)
-	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
-	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
-	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
-	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
+	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint8(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
+	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint8(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
+	fiveTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint8(1), []byte("5")[0]), NewCardinalityWithSpecificForTests(1))
+	smallerThanTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(3), uint8(1), []byte("<")[0]), NewCardinalityWithSpecificForTests(1))
 
 	conditionFirstLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
 		openTokenElWithCard,
@@ -264,9 +264,9 @@ func TestLexer_withUndeclaredReference_withPrefix_isSuccess(t *testing.T) {
 }
 
 func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_withSuccessIndex_isSuccess(t *testing.T) {
-	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
-	hyphenTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint(1), []byte("-")[0]), NewCardinalityWithSpecificForTests(1))
-	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
+	openTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(0), uint8(1), []byte("(")[0]), NewCardinalityWithSpecificForTests(1))
+	hyphenTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(1), uint8(1), []byte("-")[0]), NewCardinalityWithSpecificForTests(1))
+	closeTokenElWithCard := NewElementWithCardinalityWithTokenAndCardinalityForTests(NewTokenWithSpecificCardinalityWithByteForTests(uint(2), uint8(1), []byte(")")[0]), NewCardinalityWithSpecificForTests(1))
 	tokenLine := NewLineWithElementWithCardinalityList([]tokens.ElementWithCardinality{
 		openTokenElWithCard,
 		hyphenTokenElWithCard,
@@ -307,7 +307,7 @@ func TestLexer_withOneLine_withSpecificCardinality_withSubTokens_withSuccessInde
 
 func TestLexer_withOneLine_withSpecificCardinality_withByte_withoutSuccessIndex_isSuccess(t *testing.T) {
 	tokenIndex := uint(0)
-	specific := uint(1)
+	specific := uint8(1)
 	byteVal := []byte("(")
 
 	application := NewApplication()
@@ -339,7 +339,7 @@ func TestLexer_withOneLine_withSpecificCardinality_withByte_withoutSuccessIndex_
 
 func TestLexer_withOneLine_withMinimumCardinality_withByte_withExactlyMinOccurences_isSuccess(t *testing.T) {
 	tokenIndex := uint(0)
-	minimum := uint(2)
+	minimum := uint8(2)
 	byteVal := []byte("(")
 	data := []byte("((")
 
@@ -372,7 +372,7 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withExactlyMinOccuren
 
 func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccurences_isSuccess(t *testing.T) {
 	tokenIndex := uint(0)
-	minimum := uint(2)
+	minimum := uint8(2)
 	byteVal := []byte("(")
 	data := []byte("(((")
 
@@ -405,7 +405,7 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withMinimumPlusOccure
 
 func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_isNotSuccess(t *testing.T) {
 	tokenIndex := uint(0)
-	minimum := uint(2)
+	minimum := uint8(2)
 	byteVal := []byte("(")
 	data := []byte("(")
 
@@ -438,8 +438,8 @@ func TestLexer_withOneLine_withMinimumCardinality_withByte_withLessThanMinimum_i
 
 func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_withPrefix_isSuccess(t *testing.T) {
 	tokenIndex := uint(0)
-	minimum := uint(2)
-	maximum := uint(5)
+	minimum := uint8(2)
+	maximum := uint8(5)
 	byteVal := []byte("(")
 	data := []byte("((((((")
 
@@ -478,8 +478,8 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withMaximumExcceeded_wi
 
 func TestLexer_withOneLine_withRangeCardinality_withByte_withExactlyMaximumOccurences_isSuccess(t *testing.T) {
 	tokenIndex := uint(0)
-	minimum := uint(2)
-	maximum := uint(5)
+	minimum := uint8(2)
+	maximum := uint8(5)
 	byteVal := []byte("(")
 	data := []byte("(((((")
 
@@ -512,8 +512,8 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withExactlyMaximumOccur
 
 func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_isSuccess(t *testing.T) {
 	tokenIndex := uint(0)
-	minimum := uint(2)
-	maximum := uint(5)
+	minimum := uint8(2)
+	maximum := uint8(5)
 	byteVal := []byte("(")
 	data := []byte("((((")
 
@@ -545,8 +545,8 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_i
 }
 
 func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_withChannel_isSuccess(t *testing.T) {
-	minimum := uint(2)
-	maximum := uint(5)
+	minimum := uint8(2)
+	maximum := uint8(5)
 	byteVal := []byte("(")
 	data := []byte(" (((( ")
 
@@ -554,7 +554,7 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_w
 	grammar := NewGrammarWithChannelsForTests(
 		NewTokenWithRangeCardinalityWithByteForTests(uint(0), minimum, maximum, byteVal[0]),
 		[]channels.Channel{
-			NewChannelForTests(NewTokenWithMinimumCardinalityWithByteForTests(uint(1), uint(0), []byte(" ")[0])),
+			NewChannelForTests(NewTokenWithMinimumCardinalityWithByteForTests(uint(1), uint8(0), []byte(" ")[0])),
 		},
 	)
 
@@ -584,8 +584,8 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_w
 }
 
 func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_withChannel_withOpenParenthesisNextElement_isSuccess(t *testing.T) {
-	minimum := uint(2)
-	maximum := uint(5)
+	minimum := uint8(2)
+	maximum := uint8(5)
 	byteVal := []byte("(")
 	data := []byte(" (((( ")
 
@@ -594,9 +594,9 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_w
 		NewTokenWithRangeCardinalityWithByteForTests(uint(0), minimum, maximum, byteVal[0]),
 		[]channels.Channel{
 			NewChannelWithConditionsForTests(
-				NewTokenWithMinimumCardinalityWithByteForTests(uint(1), uint(0), []byte(" ")[0]),
+				NewTokenWithMinimumCardinalityWithByteForTests(uint(1), uint8(0), []byte(" ")[0]),
 				NewConditionWithNext(
-					NewTokenWithRangeCardinalityWithByteForTests(uint(2), uint(0), uint(2), []byte("(")[0]),
+					NewTokenWithRangeCardinalityWithByteForTests(uint(2), uint8(0), uint8(2), []byte("(")[0]),
 				),
 			),
 		},
@@ -628,8 +628,8 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_w
 }
 
 func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_withChannel_withOpenParenthesisPreviousElement_isSuccess(t *testing.T) {
-	minimum := uint(2)
-	maximum := uint(5)
+	minimum := uint8(2)
+	maximum := uint8(5)
 	byteVal := []byte("(")
 	data := []byte(" (((( ")
 
@@ -638,9 +638,9 @@ func TestLexer_withOneLine_withRangeCardinality_withByte_withinRangeOccurences_w
 		NewTokenWithRangeCardinalityWithByteForTests(uint(0), minimum, maximum, byteVal[0]),
 		[]channels.Channel{
 			NewChannelWithConditionsForTests(
-				NewTokenWithMinimumCardinalityWithByteForTests(uint(1), uint(0), []byte(" ")[0]),
+				NewTokenWithMinimumCardinalityWithByteForTests(uint(1), uint8(0), []byte(" ")[0]),
 				NewConditionWithPrevious(
-					NewTokenWithRangeCardinalityWithByteForTests(uint(2), uint(0), uint(2), []byte("(")[0]),
+					NewTokenWithRangeCardinalityWithByteForTests(uint(2), uint8(0), uint8(2), []byte("(")[0]),
 				),
 			),
 		},

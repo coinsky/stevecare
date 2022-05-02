@@ -6,8 +6,8 @@ import (
 )
 
 type rangeBuilder struct {
-	pMin *uint
-	pMax *uint
+	pMin *uint8
+	pMax *uint8
 }
 
 func createRangeBuilder() RangeBuilder {
@@ -25,13 +25,13 @@ func (app *rangeBuilder) Create() RangeBuilder {
 }
 
 // WithMinimum adds a minimum to the builder
-func (app *rangeBuilder) WithMinimum(min uint) RangeBuilder {
+func (app *rangeBuilder) WithMinimum(min uint8) RangeBuilder {
 	app.pMin = &min
 	return app
 }
 
 // WithMaximum adds a maximum to the builder
-func (app *rangeBuilder) WithMaximum(max uint) RangeBuilder {
+func (app *rangeBuilder) WithMaximum(max uint8) RangeBuilder {
 	app.pMax = &max
 	return app
 }
